@@ -56,6 +56,9 @@ fetch_all(){
   log "Linux kernel AMD headers @ ${KERNEL_REF}"
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/radeon/sid.h"        amd/kernel-sid.h        2000
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/radeon/cikd.h"       amd/kernel-cikd.h       2000
+  # cik.c carries cik_tiling_mode_table_init() — the GB_TILE_MODE / GB_MACROTILE_MODE
+  # register CONTENTS for each CIK pipe count, which no header and no Mesa file states.
+  fetch_file "${RAW_KERNEL}/drivers/gpu/drm/radeon/cik.c"        amd/kernel-cik.c        2000
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/radeon/evergreend.h" amd/kernel-evergreend.h 2000
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/amd/amdgpu/soc15d.h" amd/kernel-soc15d.h     2000
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/amd/amdgpu/nvd.h"    amd/kernel-nvd.h        2000
@@ -102,7 +105,7 @@ fetch_all(){
 }
 
 # Files whose bytes are stable enough to checksum (git-clone trees excluded — pinned by commit).
-sum_targets(){ ls amd/*.pdf amd/*.h freebsd9/* 2>/dev/null || true; }
+sum_targets(){ ls amd/*.pdf amd/*.h amd/*.c freebsd9/* 2>/dev/null || true; }
 
 write_sums(){
   log "Writing SHA256SUMS (fixed files; git trees pinned by commit above)"

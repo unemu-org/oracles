@@ -29,12 +29,13 @@ fpPS4 (code, headers, DeepWiki, design docs, URLs) are FORBIDDEN as source.
 
 ## AMD register + PM4 headers (Linux kernel — canonical MMIO reg offsets + PM4 PKT3 opcodes)
 
-Kernel `drivers/gpu/drm/{radeon,amd/amdgpu}/*.h` from `torvalds/linux` @ `master`, fetched raw 2026-07-23. License: GPL-2 (hardware register/opcode *values* are facts; cite-only, not copied).
+Kernel `drivers/gpu/drm/{radeon,amd/amdgpu}/*.{h,c}` from `torvalds/linux` @ `master`, fetched raw 2026-07-23 (`radeon/cik.c` added 2026-07-28). License: GPL-2 (hardware register/opcode *values* are facts; cite-only, not copied).
 
 | File | Origin | sha256 | Covers |
 |---|---|---|---|
 | `amd/kernel-sid.h` | radeon/sid.h (Southern Islands) | `e94b5e3d03040122698f72052efda324ba5f27a27d621d00c8974d3682ae0993` | GFX6 regs + PM4 PACKET3; tiling mode regs (#7) |
 | `amd/kernel-cikd.h` | radeon/cikd.h (Sea Islands/CIK) | `e0332925036d1f60e323364842661edee97f5f5c684a6f16d3966c776505b8d2` | **GFX7/Liverpool regs + PM4** — reg banks, PKT3 opcodes (#8, #9) |
+| `amd/kernel-cik.c` | radeon/cik.c (Sea Islands/CIK) | `dc36ae5c44ba51fb762ebb1734046665ec3bd763c39ad195f5d2e9afa52da8b4` | **`cik_tiling_mode_table_init()`** — the GB_TILE_MODE / GB_MACROTILE_MODE register CONTENTS per pipe count. The only clean statement of the CIK tile tables anywhere (Mesa reads them from the kernel at runtime, and the guest never programs them) — TASK-250 |
 | `amd/kernel-evergreend.h` | radeon/evergreend.h | `a03a2858f249b0415ef804e4e81064e395b7315ecb885fd9683fe5b01214d7c2` | older PM4 PACKET3 cross-ref |
 | `amd/kernel-soc15d.h` | amd/amdgpu/soc15d.h | `f39adef602b90ac33036d15a7710e51242ec822f826e8a9823ab466a493325f1` | PKT3/IT_* opcode list (stable across gens) |
 | `amd/kernel-nvd.h` | amd/amdgpu/nvd.h | `0a4de0b61f8be33d83e7dc1af4b96370898af36d211f296daf018e72820ea0eb` | newer PKT3/IT_* cross-ref |
