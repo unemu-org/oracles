@@ -18,9 +18,11 @@ KERNEL_REF="v6.12"                                   # torvalds/linux tag
 MESA_COMMIT="42f591b906b7e8a966cc339f84d2671f423d48c4"
 OPENORBIS_COMMIT="0a1aaf9dd4a92695538bdeb09fb056d06dd11725"
 FREEBSD_REF="release/9.0.0"                           # PS4 Orbis OS base
+VULKAN_DOCS_REF="v1.4.309"                            # KhronosGroup/Vulkan-Docs tag
 
 RAW_KERNEL="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_REF}"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
+RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 export GIT_TERMINAL_PROMPT=0
 
 log(){ printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -91,6 +93,16 @@ fetch_all(){
   fetch_file "${RAW_FREEBSD}/sys/sys/signal.h"         freebsd9/sys_sys_signal.h         500
   fetch_file "${RAW_FREEBSD}/sys/sys/unistd.h"         freebsd9/sys_sys_unistd.h         500
 
+  # --- Vulkan spec (normative SPIR-V image-operation semantics) ---
+  # `chapters/textures.adoc` is the spec source for section "Texel Gathering"
+  # ([[textures-gather]]) — the ONLY clean statement of which of the 2x2 texels an
+  # OpImage*Gather returns in which component. The AMD ISA describes gather4 as
+  # "gather 4 single component elements (2x2)" and never gives the order, and Mesa
+  # src/amd passes the hardware order through unpermuted without naming it, so this
+  # file is what closes the GCN gather lowering (TASK-277).
+  log "Vulkan-Docs @ ${VULKAN_DOCS_REF}"
+  fetch_file "${RAW_VULKAN}/chapters/textures.adoc" vulkan/textures.adoc 50000
+
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"
   if command -v llvm-mc >/dev/null; then
@@ -105,7 +117,7 @@ fetch_all(){
 }
 
 # Files whose bytes are stable enough to checksum (git-clone trees excluded — pinned by commit).
-sum_targets(){ ls amd/*.pdf amd/*.h amd/*.c freebsd9/* 2>/dev/null || true; }
+sum_targets(){ ls amd/*.pdf amd/*.h amd/*.c freebsd9/* vulkan/* 2>/dev/null || true; }
 
 write_sums(){
   log "Writing SHA256SUMS (fixed files; git trees pinned by commit above)"
@@ -116,6 +128,7 @@ write_sums(){
     echo "# mesa/mesa            $MESA_COMMIT"
     echo "# openorbis/...        $OPENORBIS_COMMIT"
     echo "# freebsd ref          $FREEBSD_REF ; kernel ref $KERNEL_REF"
+    echo "# vulkan-docs ref      $VULKAN_DOCS_REF"
   } >> SHA256SUMS
 }
 

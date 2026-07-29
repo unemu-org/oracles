@@ -74,6 +74,19 @@ Resource (Mesa gfx6/7.json + `ac_*` are the second witness). PS5 authoritative s
 **RDNA2-ISA PDF** §resource descriptors (Mesa `gfx10-rsrc.json` is the machine-readable second
 witness). The two generations' layouts differ — do not cross-apply.
 
+## Vulkan spec (normative SPIR-V image-operation semantics)
+
+`chapters/textures.adoc` from `https://github.com/KhronosGroup/Vulkan-Docs` @ tag
+`v1.4.309`. License: CC-BY-4.0 / Apache-2.0 (per repo).
+
+| File | sha256 | Covers |
+|---|---|---|
+| `vulkan/textures.adoc` | `d6469337f42c5faf4debcb3fa10b4da37ccdf281bb83d41688881c036dff6778` | **Texel Gathering (`[[textures-gather]]`)** — which of the 2x2 texels an `OpImage*Gather` returns in which component (`tau[R]=tau_i0j1`, `[G]=tau_i1j1`, `[B]=tau_i1j0`, `[A]=tau_i0j0`), plus the `i0/i1/j0/j1` linear-filter footprint they index. The **only** clean statement of the gather return order: the CI-ISA describes every gather4 opcode as "gather 4 single component elements (2x2)" and never orders them, and Mesa `src/amd` passes the hardware order through unpermuted without naming it. Witnesses TASK-277's `IMAGE_GATHER4_LZ_O` lowering. |
+
+Pairing note: this file gives the *component ordering*; Mesa `src/amd` (below) gives the
+*GCN-VGPR-to-shader-component* mapping as the identity. Neither alone is enough — the two
+together are what pin a GCN gather to `OpImageGather`.
+
 ## OpenOrbis SDK (Sony-facing formats)
 
 | Path | Commit | License | Covers |
@@ -144,8 +157,10 @@ Loader/.sb/fetch mechanisms validate against these. Cite by title+path in the le
       it carries over from PS4; the PS5 `ps5_names.txt` NID corpus feeds import resolution. The
       dumped binary is the clean primary source — cite it by title+path in the ledger. No
       external spec needed.
-- [ ] **Vulkan spec** — pin the version we target for the present path. Low priority (present
-      path is untainted).
+- [x] ~~**Vulkan spec**~~ — DONE (TASK-277): `vulkan/textures.adoc` @ `v1.4.309` pins the
+      `OpImage*Gather` return order, which nothing in the AMD ISA or Mesa `src/amd` states.
+      Only the chapter the GPU path cites is fetched; widen `RAW_VULKAN` fetches if another
+      chapter is ever needed.
 - [ ] **CLRXdisasm** — not installed; would be a second GCN disasm witness. Optional (llvm-mc
       assemble covers #6). Install `CLRadeonExtender` if a disasm-direction witness is wanted.
 - [ ] Ground-truth captures (real Celeste DCB/CCB) + dumped .sb/fetch-shaders are the Sony-GT
