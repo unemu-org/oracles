@@ -135,6 +135,22 @@ fetch_all(){
   fetch_file "${RAW_VULKAN}/chapters/resources.adoc"  vulkan/resources.adoc  50000
   fetch_file "${RAW_VULKAN}/chapters/interfaces.adoc" vulkan/interfaces.adoc 50000
   fetch_file "${RAW_VULKAN}/appendices/spirvenv.adoc" vulkan/spirvenv.adoc   50000
+  # `chapters/features.adoc` enumerates which storage-image formats the
+  # `StorageImageExtendedFormats` capability covers — the list a DECLARED `OpTypeImage`
+  # format must stay clear of to need no optional capability (TASK-299 §2c).
+  # `chapters/limits.adoc` carries the "Required Limits" table: the guaranteed floors for
+  # `maxPerStageDescriptorStorageImages`, `maxComputeSharedMemorySize` and
+  # `maxComputeWorkGroupInvocations` that bound a dispatch's declared resources.
+  # `chapters/shaders.adoc` defines the Workgroup scope — a local workgroup is the set of
+  # invocations that "can synchronize and share data with each other using memory in the
+  # Workgroup storage class", with no promise of lockstep.
+  # `appendices/memorymodel.adoc` gives the synchronizes-with rule a control barrier
+  # satisfies, which is what makes an inserted `OpControlBarrier` order one invocation's
+  # Workgroup writes before another's reads (TASK-299 §2e).
+  fetch_file "${RAW_VULKAN}/chapters/features.adoc"   vulkan/features.adoc   50000
+  fetch_file "${RAW_VULKAN}/chapters/limits.adoc"     vulkan/limits.adoc     50000
+  fetch_file "${RAW_VULKAN}/chapters/shaders.adoc"    vulkan/shaders.adoc    50000
+  fetch_file "${RAW_VULKAN}/appendices/memorymodel.adoc" vulkan/memorymodel.adoc 20000
 
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"
