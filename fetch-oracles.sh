@@ -100,8 +100,22 @@ fetch_all(){
   # "gather 4 single component elements (2x2)" and never gives the order, and Mesa
   # src/amd passes the hardware order through unpermuted without naming it, so this
   # file is what closes the GCN gather lowering (TASK-277).
+  #
+  # `chapters/renderpass.adoc` carries the framebuffer validity block, including
+  # VUID-VkFramebufferCreateInfo-flags-04535 (every attachment view's
+  # `subresourceRange.layerCount` >= `VkFramebufferCreateInfo::layers`) and
+  # VUID-VkFramebufferCreateInfo-layers-00890 (`layers` <= `maxFramebufferLayers`) — the
+  # normative rule a LAYERED colour target's framebuffer has to satisfy (TASK-279).
+  #
+  # `chapters/resources.adoc` carries the `VkImageSubresourceRange` semantics
+  # ("baseArrayLayer is the first array layer accessible to the view; layerCount is the
+  # number of array layers starting from baseArrayLayer"), which is what makes an attachment
+  # view over `SLICE_START .. SLICE_START+n` the host expression of a GCN colour target's
+  # array sub-range (TASK-279).
   log "Vulkan-Docs @ ${VULKAN_DOCS_REF}"
-  fetch_file "${RAW_VULKAN}/chapters/textures.adoc" vulkan/textures.adoc 50000
+  fetch_file "${RAW_VULKAN}/chapters/textures.adoc"   vulkan/textures.adoc   50000
+  fetch_file "${RAW_VULKAN}/chapters/renderpass.adoc" vulkan/renderpass.adoc 50000
+  fetch_file "${RAW_VULKAN}/chapters/resources.adoc"  vulkan/resources.adoc  50000
 
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"

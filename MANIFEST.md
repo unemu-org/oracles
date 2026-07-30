@@ -74,14 +74,16 @@ Resource (Mesa gfx6/7.json + `ac_*` are the second witness). PS5 authoritative s
 **RDNA2-ISA PDF** §resource descriptors (Mesa `gfx10-rsrc.json` is the machine-readable second
 witness). The two generations' layouts differ — do not cross-apply.
 
-## Vulkan spec (normative SPIR-V image-operation semantics)
+## Vulkan spec (normative SPIR-V image-operation + host resource semantics)
 
-`chapters/textures.adoc` from `https://github.com/KhronosGroup/Vulkan-Docs` @ tag
+`chapters/*.adoc` from `https://github.com/KhronosGroup/Vulkan-Docs` @ tag
 `v1.4.309`. License: CC-BY-4.0 / Apache-2.0 (per repo).
 
 | File | sha256 | Covers |
 |---|---|---|
 | `vulkan/textures.adoc` | `d6469337f42c5faf4debcb3fa10b4da37ccdf281bb83d41688881c036dff6778` | **Texel Gathering (`[[textures-gather]]`)** — which of the 2x2 texels an `OpImage*Gather` returns in which component (`tau[R]=tau_i0j1`, `[G]=tau_i1j1`, `[B]=tau_i1j0`, `[A]=tau_i0j0`), plus the `i0/i1/j0/j1` linear-filter footprint they index. The **only** clean statement of the gather return order: the CI-ISA describes every gather4 opcode as "gather 4 single component elements (2x2)" and never orders them, and Mesa `src/amd` passes the hardware order through unpermuted without naming it. Witnesses TASK-277's `IMAGE_GATHER4_LZ_O` lowering. |
+| `vulkan/renderpass.adoc` | `fc42ab2d443f6345dde25d232eb4cc261e9f4b4426dcecb754355bf393b52f8b` | **`VkFramebufferCreateInfo` validity** — `VUID-VkFramebufferCreateInfo-flags-04535` (each attachment view's `subresourceRange.layerCount` must be `>=` the framebuffer's `layers`) and `VUID-VkFramebufferCreateInfo-layers-00890` (`layers <= maxFramebufferLayers`). The normative rule a LAYERED colour target's framebuffer has to satisfy; nothing in the AMD ISA or Mesa states the host-side constraint. Witnesses TASK-279's layered render targets. |
+| `vulkan/resources.adoc` | `57f852f7268d40a2890cc7fe6cd955a098132c8e49e965b1c9572d8165446051` | **`VkImageSubresourceRange` semantics** — "`baseArrayLayer` is the first array layer accessible to the view; `layerCount` is the number of array layers (starting from `baseArrayLayer`) accessible to the view", plus `VK_REMAINING_ARRAY_LAYERS`. This is what makes an attachment view over `SLICE_START .. SLICE_START+n` the host expression of a GCN colour target's array sub-range (TASK-279); Mesa `ac_descriptors.c` gives the guest side (`SLICE_START = first_layer`), this gives the host side. |
 
 Pairing note: this file gives the *component ordering*; Mesa `src/amd` (below) gives the
 *GCN-VGPR-to-shader-component* mapping as the identity. Neither alone is enough — the two
@@ -157,10 +159,12 @@ Loader/.sb/fetch mechanisms validate against these. Cite by title+path in the le
       it carries over from PS4; the PS5 `ps5_names.txt` NID corpus feeds import resolution. The
       dumped binary is the clean primary source — cite it by title+path in the ledger. No
       external spec needed.
-- [x] ~~**Vulkan spec**~~ — DONE (TASK-277): `vulkan/textures.adoc` @ `v1.4.309` pins the
-      `OpImage*Gather` return order, which nothing in the AMD ISA or Mesa `src/amd` states.
-      Only the chapter the GPU path cites is fetched; widen `RAW_VULKAN` fetches if another
-      chapter is ever needed.
+- [x] ~~**Vulkan spec**~~ — DONE (TASK-277, widened TASK-279): `vulkan/textures.adoc` @
+      `v1.4.309` pins the `OpImage*Gather` return order, which nothing in the AMD ISA or Mesa
+      `src/amd` states; `renderpass.adoc` + `resources.adoc` pin the framebuffer-layers VUIDs
+      and the image-view array-sub-range semantics the layered-render-target path relies on.
+      Only the chapters the GPU path cites are fetched; add another `fetch_file` under
+      `RAW_VULKAN` if a further chapter is ever needed.
 - [ ] **CLRXdisasm** — not installed; would be a second GCN disasm witness. Optional (llvm-mc
       assemble covers #6). Install `CLRadeonExtender` if a disasm-direction witness is wanted.
 - [ ] Ground-truth captures (real Celeste DCB/CCB) + dumped .sb/fetch-shaders are the Sony-GT
