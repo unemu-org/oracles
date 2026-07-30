@@ -112,10 +112,25 @@ fetch_all(){
   # number of array layers starting from baseArrayLayer"), which is what makes an attachment
   # view over `SLICE_START .. SLICE_START+n` the host expression of a GCN colour target's
   # array sub-range (TASK-279).
+  #
+  # `chapters/interfaces.adoc` carries the built-in variable rules, including the whole
+  # `Layer` block: VUID-Layer-Layer-04272 (which execution models may use it),
+  # VUID-Layer-Layer-04274 (Output storage class outside a fragment shader),
+  # VUID-Layer-Layer-04276 (a scalar 32-bit integer), and the out-of-range clause — a
+  # `Layer` value outside the framebuffer's layer count leaves the framebuffer values for
+  # ALL layers undefined. That last one is why an exported slice index is gated rather than
+  # trusted (TASK-279).
+  #
+  # `appendices/spirvenv.adoc` carries the SPIR-V environment rules: a module must not use a
+  # capability or an `OpExtension` whose corresponding Vulkan extension is not enabled on
+  # the device. That is the normative basis for the guest-side device-capability gate in
+  # front of the `ShaderViewportIndexLayerEXT` module the recompiler emits (TASK-279).
   log "Vulkan-Docs @ ${VULKAN_DOCS_REF}"
   fetch_file "${RAW_VULKAN}/chapters/textures.adoc"   vulkan/textures.adoc   50000
   fetch_file "${RAW_VULKAN}/chapters/renderpass.adoc" vulkan/renderpass.adoc 50000
   fetch_file "${RAW_VULKAN}/chapters/resources.adoc"  vulkan/resources.adoc  50000
+  fetch_file "${RAW_VULKAN}/chapters/interfaces.adoc" vulkan/interfaces.adoc 50000
+  fetch_file "${RAW_VULKAN}/appendices/spirvenv.adoc" vulkan/spirvenv.adoc   50000
 
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"
