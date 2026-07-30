@@ -105,7 +105,11 @@ fetch_all(){
   # VUID-VkFramebufferCreateInfo-flags-04535 (every attachment view's
   # `subresourceRange.layerCount` >= `VkFramebufferCreateInfo::layers`) and
   # VUID-VkFramebufferCreateInfo-layers-00890 (`layers` <= `maxFramebufferLayers`) — the
-  # normative rule a LAYERED colour target's framebuffer has to satisfy (TASK-279).
+  # normative rule a LAYERED colour target's framebuffer has to satisfy (TASK-279). The same
+  # file carries the "Render Pass Compatibility" section ([[renderpass-compatibility]]) —
+  # "Two attachment references are compatible if they have matching format and sample count"
+  # — the rule that ties the colour format of the pass a draw is recorded into to the format
+  # of the pass its pipeline was created against (TASK-290).
   #
   # `chapters/resources.adoc` carries the `VkImageSubresourceRange` semantics
   # ("baseArrayLayer is the first array layer accessible to the view; layerCount is the
