@@ -73,7 +73,7 @@ fetch_all(){
     git clone --filter=blob:none --no-checkout https://gitlab.freedesktop.org/mesa/mesa.git mesa/mesa
   fi
   git -C mesa/mesa sparse-checkout set src/amd/common src/amd/registers \
-    src/gallium/drivers/radeonsi
+    src/amd/addrlib src/gallium/drivers/radeonsi
   git -C mesa/mesa fetch --depth 1 origin "$MESA_COMMIT" 2>/dev/null || git -C mesa/mesa fetch origin
   git -C mesa/mesa checkout -q "$MESA_COMMIT"
 
