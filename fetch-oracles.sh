@@ -129,8 +129,15 @@ fetch_all(){
   # capability or an `OpExtension` whose corresponding Vulkan extension is not enabled on
   # the device. That is the normative basis for the guest-side device-capability gate in
   # front of the `ShaderViewportIndexLayerEXT` module the recompiler emits (TASK-279).
+  # `chapters/samplers.adoc` is the only normative statement of what each `VkCompareOp`
+  # enumerant COMPUTES — "VK_COMPARE_OP_LESS specifies that the comparison evaluates
+  # reference < test" and so on. `chapters/textures.adoc` §"Depth Compare Operation" says
+  # which value plays which role (the SPIR-V `Dref` operand is the reference, the texel
+  # depth is the test) but never defines the operators themselves, so the shadow-lookup
+  # oracle needs both files to compute a result at all (TASK-287).
   log "Vulkan-Docs @ ${VULKAN_DOCS_REF}"
   fetch_file "${RAW_VULKAN}/chapters/textures.adoc"   vulkan/textures.adoc   50000
+  fetch_file "${RAW_VULKAN}/chapters/samplers.adoc"   vulkan/samplers.adoc   50000
   fetch_file "${RAW_VULKAN}/chapters/renderpass.adoc" vulkan/renderpass.adoc 50000
   fetch_file "${RAW_VULKAN}/chapters/resources.adoc"  vulkan/resources.adoc  50000
   fetch_file "${RAW_VULKAN}/chapters/interfaces.adoc" vulkan/interfaces.adoc 50000
