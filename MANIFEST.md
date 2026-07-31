@@ -110,6 +110,18 @@ Pairing note: this file gives the *component ordering*; Mesa `src/amd` (below) g
 *GCN-VGPR-to-shader-component* mapping as the identity. Neither alone is enough — the two
 together are what pin a GCN gather to `OpImageGather`.
 
+## SPIR-V specification (Khronos registry)
+
+The Vulkan-Docs tree carries the SPIR-V *environment* appendix and the memory model but not
+the instruction definitions. Khronos publishes those as one HTML document with no git ref
+behind it, so it is pinned by sha256 like the AMD PDFs. Fetched 2026-07-31 from
+`https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html`. License: Khronos
+specification copyright (reference material, not redistributed — gitignored like the PDFs).
+
+| File | sha256 | Covers |
+|---|---|---|
+| `vulkan/spirv-core.html` | `1130eba96d16fd33fd6040b986ab57c941fb5bbf16d2bc1d0a62ccdc60fd7668` | **`OpAtomicIAdd`** — "Perform the following steps atomically with respect to any other atomic accesses within Memory to the same location: 1) load through Pointer to get an Original Value, 2) get a New Value by integer addition of Original Value and Value, and 3) store the New Value back through Pointer. The instruction's result is the Original Value." That last sentence is what makes it the counterpart of GCN's `DS_ADD_RTN_U32`, whose `_RTN_` form returns the pre-op value; nothing in Vulkan-Docs states it. **`OpControlBarrier`** — "Wait for all invocations in the scope restricted tangle to reach the current point of execution before executing further instructions", and the clause the workgroup oracle is built around: "When Execution is `Workgroup` or larger, behavior is undefined unless all invocations within Execution execute the same dynamic instance of this instruction." Witnesses TASK-299's multi-wave barrier scheduler and its LDS atomic. |
+
 ## OpenOrbis SDK (Sony-facing formats)
 
 | Path | Commit | License | Covers |

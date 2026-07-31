@@ -186,6 +186,23 @@ fetch_all(){
   fetch_file "${RAW_VULKAN}/chapters/descriptorsets.adoc"  vulkan/descriptorsets.adoc  50000
   fetch_file "${RAW_VULKAN}/xml/vk.xml"                    vulkan/vk.xml             1000000
 
+  # --- SPIR-V core specification (Khronos registry) ---
+  # The Vulkan-Docs tree carries only the ENVIRONMENT appendix (`spirvenv.adoc`) and the
+  # memory model; the instruction definitions themselves live in the SPIR-V specification,
+  # which Khronos publishes as one HTML document. Two facts in the compute lowering come
+  # from nowhere else (TASK-299): `OpAtomicIAdd`'s "The instruction's result is the
+  # Original Value", which is what makes it the counterpart of GCN's `DS_ADD_RTN_U32`; and
+  # `OpControlBarrier`'s "when Execution is Workgroup or larger, behavior is undefined
+  # unless all invocations within Execution execute the same dynamic instance of this
+  # instruction", which is the rule the workgroup oracle's barrier scheduler enforces and
+  # the reason a non-workgroup-uniform barrier is refused rather than paired up.
+  #
+  # The URL is the published "unified1" artifact rather than a git ref — Khronos does not
+  # publish the spec source — so it is pinned BY SHA256 in SHA256SUMS like the AMD PDFs.
+  log "SPIR-V specification (registry.khronos.org)"
+  fetch_file "https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html" \
+    vulkan/spirv-core.html 1000000
+
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"
   if command -v llvm-mc >/dev/null; then
