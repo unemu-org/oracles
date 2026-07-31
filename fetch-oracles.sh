@@ -147,10 +147,34 @@ fetch_all(){
   # `appendices/memorymodel.adoc` gives the synchronizes-with rule a control barrier
   # satisfies, which is what makes an inserted `OpControlBarrier` order one invocation's
   # Workgroup writes before another's reads (TASK-299 §2e).
+  # `chapters/devsandqueues.adoc` states the only guarantee there is about queue-family
+  # capabilities: "If an implementation exposes any queue family that supports graphics
+  # operations, at least one queue family of at least one physical device exposed by the
+  # implementation must support both graphics and compute operations." That is what makes
+  # asking for GRAPHICS|COMPUTE on ONE family a safe requirement rather than a gamble
+  # (TASK-299 §3b).
+  # `chapters/dispatch.adoc` is the dispatching-commands chapter — `vkCmdDispatch`'s
+  # groupCount limits, and the statement that a compute pipeline must be bound before any
+  # dispatching command is recorded.
+  # `chapters/synchronization.adoc` defines the pipeline stages and access flags a
+  # per-dispatch barrier is written in (`VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT`,
+  # `VK_ACCESS_SHADER_WRITE_BIT`/`_READ_BIT` naming storage-image access specifically).
+  # `chapters/descriptorsets.adoc` gives the storage-image descriptor's two host rules: its
+  # subresources "must be in the VK_IMAGE_LAYOUT_GENERAL layout in order to access its data
+  # in a shader", and a STORE needs the view's format features to contain
+  # `VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT`.
+  # `xml/vk.xml` is the machine-readable spec source; it is where `vkCmdDispatch` carries
+  # `renderpass="outside"`, i.e. the property that generates VUID-vkCmdDispatch-renderpass —
+  # the rule that forces a dispatch to close the render pass (TASK-299 §3b).
   fetch_file "${RAW_VULKAN}/chapters/features.adoc"   vulkan/features.adoc   50000
   fetch_file "${RAW_VULKAN}/chapters/limits.adoc"     vulkan/limits.adoc     50000
   fetch_file "${RAW_VULKAN}/chapters/shaders.adoc"    vulkan/shaders.adoc    50000
   fetch_file "${RAW_VULKAN}/appendices/memorymodel.adoc" vulkan/memorymodel.adoc 20000
+  fetch_file "${RAW_VULKAN}/chapters/devsandqueues.adoc"   vulkan/devsandqueues.adoc   50000
+  fetch_file "${RAW_VULKAN}/chapters/dispatch.adoc"        vulkan/dispatch.adoc         5000
+  fetch_file "${RAW_VULKAN}/chapters/synchronization.adoc" vulkan/synchronization.adoc 50000
+  fetch_file "${RAW_VULKAN}/chapters/descriptorsets.adoc"  vulkan/descriptorsets.adoc  50000
+  fetch_file "${RAW_VULKAN}/xml/vk.xml"                    vulkan/vk.xml             1000000
 
   # --- llvm-mc (witness tool; record version) ---
   log "llvm-mc witness"
