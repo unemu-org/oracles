@@ -65,12 +65,15 @@ fetch_all(){
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/amd/amdgpu/soc15d.h" amd/kernel-soc15d.h     2000
   fetch_file "${RAW_KERNEL}/drivers/gpu/drm/amd/amdgpu/nvd.h"    amd/kernel-nvd.h        2000
 
-  # --- Mesa src/amd (sparse, blobless) — PM4/registers/tiling/descriptors ---
-  log "Mesa src/amd @ ${MESA_COMMIT:0:10}"
+  # --- Mesa src/amd + radeonsi (sparse, blobless) — PM4/registers/tiling/descriptors,
+  #     and the driver that PROGRAMS those registers (which value means what, and when a
+  #     field is consulted at all: e.g. SPI_PS_INPUT_CNTL's OFFSET=0x20 DEFAULT_VAL escape).
+  log "Mesa src/amd + radeonsi @ ${MESA_COMMIT:0:10}"
   if [ ! -d mesa/mesa/.git ]; then
     git clone --filter=blob:none --no-checkout https://gitlab.freedesktop.org/mesa/mesa.git mesa/mesa
-    git -C mesa/mesa sparse-checkout set src/amd/common src/amd/registers
   fi
+  git -C mesa/mesa sparse-checkout set src/amd/common src/amd/registers \
+    src/gallium/drivers/radeonsi
   git -C mesa/mesa fetch --depth 1 origin "$MESA_COMMIT" 2>/dev/null || git -C mesa/mesa fetch origin
   git -C mesa/mesa checkout -q "$MESA_COMMIT"
 

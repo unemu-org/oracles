@@ -44,9 +44,9 @@ Note: kernel radeon headers + Mesa (below) are independent witnesses for the sam
 upstream AMD facts (PM4/registers). Cross-agreement between them and the CI-ISA PDF is
 the proof for #8/#9.
 
-## Mesa `src/amd` (second witness: PM4, registers, tiling, descriptors)
+## Mesa `src/amd` + `radeonsi` (second witness: PM4, registers, tiling, descriptors)
 
-Sparse blobless clone of `src/amd/{common,registers}` from
+Sparse blobless clone of `src/amd/{common,registers}` and `src/gallium/drivers/radeonsi` from
 `https://gitlab.freedesktop.org/mesa/mesa.git` (git clone works — Anubis blocks the
 browser, not the git protocol) @ commit `42f591b906b7e8a966cc339f84d2671f423d48c4`,
 2026-07-23. License: MIT.
@@ -57,6 +57,14 @@ browser, not the git protocol) @ commit `42f591b906b7e8a966cc339f84d2671f423d48c
 | `mesa/mesa/src/amd/common/ac_surface.c` | `062351d2d2e5c6c2251e308be0fd952f94ed2ac9d0847f8ac345034a58bfa3d3` | **tiling / surface math (#7)** — GFX6 through GFX12, incl. **GFX10.3 (RDNA2) tiling + DCC** |
 | `mesa/mesa/src/amd/registers/gfx6.json` | `38b492cf4211615934372777c55381ba21e448d3f199ddf1394def62446ce1a1` | machine-readable GFX6 register layouts (#5, #9, #11) |
 | `mesa/mesa/src/amd/registers/gfx7.json` | (in tree) | GFX7/Liverpool register layouts |
+
+**The driver that programs those registers** — the register files say what a field IS; radeonsi
+says which value means what and *when the hardware consults the field at all*. Same pinned clone:
+
+| File | sha256 | Covers |
+|---|---|---|
+| `mesa/mesa/src/gallium/drivers/radeonsi/gfx/si_shader.c` | (in tree, git-pinned) | how a VS→PS varying becomes `SPI_PS_INPUT_CNTL`: "OFFSET=0x20 means that DEFAULT_VAL is used" — the ONE condition under which the SPI substitutes a constant (TASK-306) |
+| `mesa/mesa/src/gallium/drivers/radeonsi/gfx/si_state_shaders.cpp` | (in tree, git-pinned) | `si_emit_spi_map()` — reads the same escape back (`G_028644_OFFSET(...) != 0x20`) to gate `FLAT_SHADE`/FP16 fields |
 
 **PS5 / RDNA2 (GFX10.3) register + descriptor witnesses** — same pinned Mesa clone (`MESA_COMMIT`), just not previously listed:
 
