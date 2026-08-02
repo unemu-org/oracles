@@ -28,6 +28,15 @@ export GIT_TERMINAL_PROMPT=0
 log(){ printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 warn(){ printf '\033[1;33m!!\033[0m %s\n' "$*" >&2; }
 
+# --- provenance quarantine (MANIFEST.md "Second-hand blocks in a clean source") ---
+# One file in the OpenOrbis tree cites a PS4 EMULATOR project as the source of its own
+# EVFILT_* block. The AGENTS.md provenance rule governs what we CONSULT, not only what we
+# commit, and the stash is exactly where an agent goes expecting a clean source — so the
+# block is excised at fetch time rather than left to be read in good faith.
+OO_KERNEL_H="openorbis/OpenOrbis-PS4-Toolchain/include/orbis/_types/kernel.h"
+OO_TAINT_MARKER="red-prig/fpPS4"
+QUARANTINE_MARK="unemups4-quarantine"
+
 fetch_file(){ # url dest [min_bytes] — writes to a temp, keeps existing file on failure
   local url="$1" dest="$2" min="${3:-500}" tmp
   mkdir -p "$(dirname "$dest")"
@@ -41,6 +50,38 @@ fetch_file(){ # url dest [min_bytes] — writes to a temp, keeps existing file o
   fi
   mv "$tmp" "$dest"
   printf '   %-40s http=%s size=%s\n' "$dest" "$code" "$sz"
+}
+
+quarantine_openorbis(){ # excise the emulator-sourced block; idempotent
+  if [ ! -f "$OO_KERNEL_H" ]; then
+    warn "quarantine: $OO_KERNEL_H absent (OpenOrbis clone not fetched?)"
+    return 0
+  fi
+  if grep -q "$QUARANTINE_MARK" "$OO_KERNEL_H"; then
+    printf '   %-40s already quarantined\n' "$OO_KERNEL_H"
+    return 0
+  fi
+  if ! grep -q "$OO_TAINT_MARKER" "$OO_KERNEL_H"; then
+    warn "quarantine: '$OO_TAINT_MARKER' NOT found in $OO_KERNEL_H — upstream moved or dropped"
+    warn "  the block. Re-locate it before trusting this file; do not assume it is clean."
+    return 1
+  fi
+  awk -v mark="$QUARANTINE_MARK" '
+    $0 ~ /red-prig\/fpPS4/ {
+      skip = 1
+      print "// [" mark "] An EVFILT_* block stood here that cited a PS4 EMULATOR project as"
+      print "// its own source. unemups4 is clean-room and its provenance rule governs what we"
+      print "// CONSULT, so fetch-oracles.sh removes it — nothing here was ever derived from it."
+      print "// Base kqueue filters (-1..-11) have a first-hand source: freebsd9/sys_sys_event.h."
+      print "// The console-specific filters (-12..-22) have NO clean source; derive them from"
+      print "// the dumped guest binary instead. Reasoning: oracles/MANIFEST.md."
+      next
+    }
+    skip && /EVFILT_SYSCOUNT/ { skip = 0; next }
+    !skip { print }
+  ' "$OO_KERNEL_H" > "$OO_KERNEL_H.tmp"
+  mv "$OO_KERNEL_H.tmp" "$OO_KERNEL_H"
+  printf '   %-40s emulator-sourced EVFILT_* block excised\n' "$OO_KERNEL_H"
 }
 
 fetch_all(){
@@ -83,7 +124,10 @@ fetch_all(){
     git clone --filter=blob:none https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain.git openorbis/OpenOrbis-PS4-Toolchain
   fi
   git -C openorbis/OpenOrbis-PS4-Toolchain fetch --depth 1 origin "$OPENORBIS_COMMIT" 2>/dev/null || git -C openorbis/OpenOrbis-PS4-Toolchain fetch origin
-  git -C openorbis/OpenOrbis-PS4-Toolchain checkout -q "$OPENORBIS_COMMIT"
+  # -f: the quarantine below leaves one file modified, so a plain checkout would refuse to
+  # move the pin. Discard it and re-apply — the quarantine is the reproducible step.
+  git -C openorbis/OpenOrbis-PS4-Toolchain checkout -qf "$OPENORBIS_COMMIT"
+  quarantine_openorbis || warn "OpenOrbis quarantine did not apply — see MANIFEST.md"
 
   # --- FreeBSD 9.0 (Orbis OS base): syscall table, errno, ELF, mman, fcntl ---
   log "FreeBSD ${FREEBSD_REF}"
@@ -95,6 +139,25 @@ fetch_all(){
   fetch_file "${RAW_FREEBSD}/sys/sys/fcntl.h"          freebsd9/sys_sys_fcntl.h          500
   fetch_file "${RAW_FREEBSD}/sys/sys/signal.h"         freebsd9/sys_sys_signal.h         500
   fetch_file "${RAW_FREEBSD}/sys/sys/unistd.h"         freebsd9/sys_sys_unistd.h         500
+  # `mman.h` gives the MAP_* flag VALUES but says nothing about what a mapping does when the
+  # requested range is already mapped. That contract is stated in exactly two places, and
+  # `sceKernelBatchMap`'s direct-memory entries need it (TASK-341/TASK-344):
+  #   - `lib/libc/sys/mmap.2` — normative: "If a MAP_FIXED request is successful, the mapping
+  #     established by mmap replaces any previous mappings for the process' pages in the range
+  #     from addr to addr + len", i.e. an overlap is NOT an error. Its ERRORS section reserves
+  #     ENOMEM for "MAP_FIXED was specified and the addr argument was not available".
+  #   - `sys/vm/vm_mmap.c` — the implementation that backs it: `sys_mmap()`'s MAP_FIXED path
+  #     fails only with EINVAL (misalignment, range outside the user map, wrap), and
+  #     `vm_mmap_object()` routes the fixed case to `vm_map_fixed()` (replace) rather than
+  #     `vm_map_find()` (search). `vm_mmap_to_errno()` is the whole failure vocabulary.
+  # 9.0 has no MAP_EXCL, so there is no way to ask this mmap to REFUSE on collision.
+  fetch_file "${RAW_FREEBSD}/lib/libc/sys/mmap.2"      freebsd9/lib_libc_sys_mmap.2      500
+  fetch_file "${RAW_FREEBSD}/sys/vm/vm_mmap.c"         freebsd9/sys_vm_vm_mmap.c         500
+  # First-hand replacement for the EVFILT_* block quarantined out of the OpenOrbis header
+  # (see `quarantine_openorbis`): the BASE kqueue filters, EVFILT_READ..EVFILT_USER (-1..-11)
+  # with EVFILT_SYSCOUNT 11. Sony's console-specific filters (-12..-22) are NOT here and have
+  # no clean source — derive those from the dumped guest binary or leave them unmodelled.
+  fetch_file "${RAW_FREEBSD}/sys/sys/event.h"          freebsd9/sys_sys_event.h          500
 
   # --- Vulkan spec (normative SPIR-V image-operation semantics) ---
   # `chapters/textures.adoc` is the spec source for section "Texel Gathering"
@@ -232,6 +295,24 @@ write_sums(){
   } >> SHA256SUMS
 }
 
+verify_quarantine(){ # non-fatal when the stash is absent; LOUD when the taint is present
+  if [ ! -f "$OO_KERNEL_H" ]; then
+    printf '   %-40s absent (stash not fetched)\n' "$OO_KERNEL_H"
+    return 0
+  fi
+  if grep -q "$OO_TAINT_MARKER" "$OO_KERNEL_H"; then
+    warn "PROVENANCE: emulator-sourced block is PRESENT in $OO_KERNEL_H"
+    warn "  run './fetch-oracles.sh quarantine' before consulting the OpenOrbis tree"
+    return 1
+  fi
+  if grep -q "$QUARANTINE_MARK" "$OO_KERNEL_H"; then
+    printf '   %-40s quarantine in place\n' "$OO_KERNEL_H"
+  else
+    warn "quarantine marker missing in $OO_KERNEL_H (upstream changed?) — re-check by hand"
+    return 1
+  fi
+}
+
 verify(){
   [ -f SHA256SUMS ] || { warn "no SHA256SUMS — run 'fetch' first"; exit 1; }
   log "Verifying fixed files against SHA256SUMS"
@@ -239,11 +320,14 @@ verify(){
   log "git-pinned trees (check HEAD == pinned commit):"
   printf '   mesa      %s (want %s)\n' "$(git -C mesa/mesa rev-parse HEAD 2>/dev/null || echo MISSING)" "$MESA_COMMIT"
   printf '   openorbis %s (want %s)\n' "$(git -C openorbis/OpenOrbis-PS4-Toolchain rev-parse HEAD 2>/dev/null || echo MISSING)" "$OPENORBIS_COMMIT"
+  log "provenance quarantine:"
+  verify_quarantine
 }
 
 case "${1:-fetch}" in
-  fetch)  fetch_all ;;
-  verify) verify ;;
-  sums)   write_sums ;;
-  *) echo "usage: $0 [fetch|verify|sums]"; exit 2 ;;
+  fetch)      fetch_all ;;
+  verify)     verify ;;
+  sums)       write_sums ;;
+  quarantine) quarantine_openorbis ;;
+  *) echo "usage: $0 [fetch|verify|sums|quarantine]"; exit 2 ;;
 esac
