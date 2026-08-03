@@ -248,6 +248,19 @@ fetch_all(){
   fetch_file "${RAW_VULKAN}/chapters/synchronization.adoc" vulkan/synchronization.adoc 50000
   fetch_file "${RAW_VULKAN}/chapters/descriptorsets.adoc"  vulkan/descriptorsets.adoc  50000
   fetch_file "${RAW_VULKAN}/xml/vk.xml"                    vulkan/vk.xml             1000000
+  # `chapters/drawing.adoc` is the only normative statement of how a TRIANGLE_STRIP is
+  # ASSEMBLED into primitives — `p_i = {v_i, v_{i+(1+i%2)}, v_{i+(2-i%2)}}`, i.e. an odd
+  # primitive is `(i, i+2, i+1)` — stated unconditionally, before any provoking-vertex
+  # discussion, so it is the order the whole pipeline (a geometry shader's input included)
+  # receives. Its note says why the reversal exists: "so that the winding order is consistent
+  # throughout the strip". `chapters/primsrast.adoc` carries the barycentric vertex-order
+  # tables the `triStripVertexOrderIndependentOfProvokingVertex` limit refers to, which is
+  # what bounds the implementation-dependent part to the LAST_VERTEX variant alone.
+  # Fetched because TASK-362 had concluded from that limit ALONE — without the chapters it
+  # points at — that the order was not fixed by any readable source, and sent the question to
+  # the console (TASK-357/362).
+  fetch_file "${RAW_VULKAN}/chapters/drawing.adoc"         vulkan/drawing.adoc         50000
+  fetch_file "${RAW_VULKAN}/chapters/primsrast.adoc"       vulkan/primsrast.adoc      100000
 
   # --- SPIR-V core specification (Khronos registry) ---
   # The Vulkan-Docs tree carries only the ENVIRONMENT appendix (`spirvenv.adoc`) and the
