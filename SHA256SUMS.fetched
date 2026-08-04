@@ -1,0 +1,9 @@
+# Sources that may NOT be redistributed (© AMD ISA PDFs; the Khronos SPIR-V spec).
+# They are gitignored — these hashes ARE the pin: fetch them and check yourself.
+# vulkan/spirv-core.html is hashed with the CDN-injected challenge script line
+# ('__CF$cv$params') removed: registry.khronos.org rewrites it on every request,
+# so the raw bytes are not reproducible. See pin_hash() in fetch-oracles.sh.
+a62ed1c0c1fb3f3215ed6cf45218c70d4caf059398906f645d6a366a70abde98  amd/ci-isa.pdf
+22aec03f2706dba2e148ffde1f3a25d5cdd42c71a96f95240aeb48d995d44795  amd/rdna2-isa.pdf
+f09c4c5327f1e845cc79197f4bfc45fe49fe94709895fe0abd2624055eafc99f  amd/si-isa.pdf
+f3eb5d5191b6b55bd9ccf591d992166842fee1e7952e56f35378e04d3c5125c5  vulkan/spirv-core.html
