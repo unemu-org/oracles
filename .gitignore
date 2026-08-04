@@ -5,3 +5,5 @@
 !.gitignore
 !fetch-oracles.sh
 !MANIFEST.md
+!README.md
+!COPYING
