@@ -33,6 +33,9 @@ uses, so this file follows the pin automatically.
 | FreeBSD 9.0 — syscall/errno/ELF/mman/kqueue sources (`freebsd9/`) | https://github.com/freebsd/freebsd-src | `release/9.0.0` | BSD-2-Clause / BSD-3-Clause, © The Regents of the University of California and others; licence text vendored as `freebsd9/COPYRIGHT`, per-file notices preserved. |
 | Vulkan specification — chapters, appendices and the registry (`vulkan/*.adoc`, `vulkan/vk.xml`) | https://github.com/KhronosGroup/Vulkan-Docs | `v1.4.309` | The `.adoc` files: **CC-BY-4.0**, © 2015-2025 The Khronos Group Inc. (SPDX header in each file). `vk.xml`: **Apache-2.0 OR MIT**, same copyright. Licence text vendored as `vulkan/LICENSE.adoc`; full CC-BY-4.0 at https://creativecommons.org/licenses/by/4.0/. Unmodified. |
 | Mesa — `src/amd` (common, registers, addrlib, llvm, compiler) and `src/gallium/drivers/radeonsi` (`mesa/mesa/`) | https://gitlab.freedesktop.org/mesa/mesa.git | `42f591b906b7e8a966cc339f84d2671f423d48c4` | **MIT**, © Advanced Micro Devices, Inc., Red Hat, VMware, Valve and other Mesa contributors (SPDX header in each file). Licence text vendored as `mesa/mesa/licenses/MIT` and `mesa/mesa/docs/license.rst`. |
+| Linux kernel — x86 syscall tables and process/signal uapi headers (`linux-x86/`) | https://github.com/torvalds/linux | `v6.12` | **GPL-2.0 WITH Linux-syscall-note** (SPDX header in each file). Licence text vendored as `linux-x86/COPYING` and `linux-x86/LICENSES_exceptions_Linux-syscall-note`. See the GPL-2.0 note below. |
+| MOO — the SingleStepTests container format: spec + reference parser (`moo/`) | https://github.com/dbalsom/moo | `c438962d2b30856817d8e59bd5f0f4c628596ca8` | **MIT**, © Daniel Balsom. Licence text vendored as `moo/LICENSE`. |
+| SingleStepTests 80286 — documentation and revocation list only, **not** the corpus (`ss286/`) | https://github.com/SingleStepTests/80286 | `37c73caf53dcd22d3dd369ff09305d13d117a4fe` | **MIT**, © Daniel Balsom. Licence text vendored as `ss286/LICENSE`. The 611 MB corpus itself is fetched by the consumer at this same pin, not mirrored here. |
 
 ### MIT licence text (Mesa, and the AMD kernel headers)
 
@@ -63,6 +66,27 @@ Group Inc., licensed CC-BY-4.0, obtained from the Vulkan-Docs repository at the 
 above, and are reproduced here **unmodified**. This repository is not endorsed by, and its
 contents are not approved or reviewed by, The Khronos Group.
 
+
+### GPL-2.0 WITH Linux-syscall-note (the `linux-x86/` tables and uapi headers)
+
+These are the first copyleft-licensed sources vendored here, so the reasoning is worth
+stating rather than assuming. GPL-2.0 **permits verbatim redistribution** — §1, "You may
+copy and distribute verbatim copies of the Program's source code as you receive it" —
+provided the copyright notice and the licence travel with the copy. They do: each file keeps
+its `SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note` header, and both licence texts
+are vendored beside them as `linux-x86/COPYING` and
+`linux-x86/LICENSES_exceptions_Linux-syscall-note`.
+
+The syscall-note exception is what makes these safe to *consult* from a permissively-licensed
+project at all. In the kernel's own words: "this exception does not invalidate any other
+reasons why the code file might be covered by the GNU General Public License", but user-space
+code that merely uses the kernel's syscall interface is "not considered a derived work" of
+the kernel.
+
+**Nothing else in this repository is affected.** Every vendored file keeps the licence it
+arrived under; there is no combined work here, only a stash of separately-licensed documents
+sitting in adjacent directories. Copying a file out means complying with *that file's*
+licence.
 ## NOT vendored — fetch-only, pinned by sha256 in `SHA256SUMS.fetched`
 
 These are downloaded by `./fetch-oracles.sh fetch` into a gitignored working copy. Their
@@ -74,3 +98,6 @@ compare. They are not redistributed from here:
 | AMD ISA manuals — `amd/ci-isa.pdf` (Sea Islands), `amd/si-isa.pdf` (Southern Islands), `amd/rdna2-isa.pdf` (RDNA 2) | © AMD, published with **no redistribution licence**. Cite-only. Non-negotiable: these must never be committed. |
 | SPIR-V core specification — `vulkan/spirv-core.html` | Khronos specification copyright. It grants "a conditional copyright license to use and reproduce the unmodified Specification", immediately after a sentence that separately forbids the copy being "reproduced, republished, distributed, transmitted, displayed, broadcast or otherwise exploited" without written permission. The grant does not clearly extend to redistribution, so the safe reading is fetch-only. (Its pin is taken over the document with the CDN-injected challenge-script line removed — `registry.khronos.org` rewrites that line on every request, so the raw bytes are not reproducible and a raw sha256 pin could never be checked.) |
 | OpenOrbis PS4 Toolchain — `openorbis/` | GPL-3.0, so redistribution would be *legal*. It is fetch-only for two other reasons: the clone is ~169 MB for a handful of headers plus the OELF/SELF spec, and the provenance quarantine (`MANIFEST.md`) **rewrites** one of its headers — a vendored copy would be a modified redistribution, which is exactly the thing this stash exists to avoid. Pinned by commit. |
+| Intel SDM — `intel/sdm.pdf` (combined volumes 1, 2A-D, 3A-D, 4) | © Intel Corporation, published with **no redistribution licence**. Cite-only, same class as the AMD ISA manuals. Pinned by order number *and* sha256, because Intel's download endpoint always serves the newest revision. |
+| AMD64 APM — `intel/amd64-apm.pdf` (volumes 1-5) | © Advanced Micro Devices, Inc., **no redistribution licence**. Cite-only. This is the x86-64 CPU manual, distinct from the GPU ISA manuals in `amd/`. |
+| x86-64 psABI — `psabi/*.tex` | The upstream repository (gitlab.com/x86-psABIs/x86-64-ABI) carries **no `LICENSE` and no `COPYING` file at all**. The only licence statement in its tree is one line in `abi.tex`'s revision history scoping CC-BY-4.0 to *Intel's changes*, not to the document. That is weaker than the SPIR-V case above: there, a document-wide grant exists and is merely ambiguous about redistribution; here there is no document-wide grant to be ambiguous about. Fetch-only, pinned by commit, taken as LaTeX source — the PDF upstream advertises is a CI artifact of the latest master build and expires, so it cannot be pinned. |

@@ -46,15 +46,24 @@ separately, because they mean opposite things:
 
 Vendored: the Vulkan specification chapters and `vk.xml` (CC-BY-4.0 / Apache-2.0 OR MIT), Mesa
 `src/amd` + `radeonsi` (MIT), the AMD `radeon`/`amdgpu` kernel headers (MIT), FreeBSD 9.0
-sources (BSD). Unmodified, with their licence texts and copyright headers.
+sources (BSD), the Linux x86 syscall tables and process/signal uapi headers (GPL-2.0 WITH
+Linux-syscall-note), and the SingleStepTests 80286 documentation plus the MOO container format
+(MIT). Unmodified, with their licence texts and copyright headers.
 
 **Not** vendored, and fetched to a gitignored working copy instead: the **AMD ISA PDFs**
-(© AMD, no redistribution licence — these must never be committed), the **SPIR-V core
-specification** (the Khronos grant covers use and reproduction, not clearly redistribution),
-and the **OpenOrbis toolchain** (GPL-3, so it legally could be — but it is 169 MB for a handful
-of headers, and the provenance quarantine below rewrites one of its files, which would make a
-vendored copy a *modified* redistribution). Their hashes/commits are committed, so those
+(© AMD, no redistribution licence — these must never be committed), the **Intel SDM** and the
+**AMD64 APM** (same reason), the **SPIR-V core specification** (the Khronos grant covers use
+and reproduction, not clearly redistribution), the **x86-64 psABI** (its repository carries no
+licence file at all), the **OpenOrbis toolchain** (GPL-3, so it legally could be — but it is
+169 MB for a handful of headers, and the provenance quarantine below rewrites one of its files,
+which would make a vendored copy a *modified* redistribution), and the **SingleStepTests 80286
+corpus** (MIT, so it legally could be — but it is 611 MB of test vectors, which is data to
+fetch, not a source anyone cites by section). Their hashes/commits are committed, so those
 citations stay checkable too: fetch the source yourself and compare.
+
+Two projects cite this stash: **unemups4** (PS4 emulation) and **x86jit** (an x86-64 → host
+recompiler). Their sources are grouped separately in `MANIFEST.md`, and their pins are held in
+separate variables so bumping one never moves the other's citations.
 
 `NOTICE.md` carries the full table with licence, URL and pinned ref for every entry.
 

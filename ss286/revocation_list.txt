@@ -1,0 +1,6 @@
+# Revocation list. Hash strings here identify tests which have been determined to be bad or otherwise problematic to verify
+eaaf835a6600a351ee70375c7f6996931411bca5
+1b586a46891182a22b3f55f71e4db4c601ac26e4
+e64e6de35ca857a62a8f4ccc2bf991700a564b28
+
+

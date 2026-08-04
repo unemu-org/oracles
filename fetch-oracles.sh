@@ -39,7 +39,33 @@ OPENORBIS_COMMIT="0a1aaf9dd4a92695538bdeb09fb056d06dd11725"
 FREEBSD_REF="release/9.0.0"                           # PS4 Orbis OS base
 VULKAN_DOCS_REF="v1.4.309"                            # KhronosGroup/Vulkan-Docs tag
 
+# --- x86 section (serves x86jit; MANIFEST.md "x86 ..."). Pinned SEPARATELY from KERNEL_REF
+# on purpose: the GPU register headers and the x86 syscall/uapi tables move for unrelated
+# reasons, and one consumer's ledger must not be dragged along by the other's pin bump.
+KERNEL_X86_REF="v6.12"                                # torvalds/linux tag (x86 uapi)
+PSABI_COMMIT="e1ce098331da5dbd66e1ffc74162380bcc213236"  # x86-64 psABI, 2025-03-12
+MOO_COMMIT="c438962d2b30856817d8e59bd5f0f4c628596ca8"    # dbalsom/moo, 2025-11-19
+SS286_COMMIT="37c73caf53dcd22d3dd369ff09305d13d117a4fe"  # SingleStepTests/80286, 2025-11-02
+
+# Intel SDM: the "latest" endpoint (cdrdv2.intel.com/v1/dl/getContent/671200) MOVES on every
+# revision, so it cannot be the pin. The pin is the revision-specific asset it redirects to —
+# order number, revision and cdrdv2 content id all recorded, so a reader can tell WHICH
+# document a citation meant even after Intel publishes the next one. To move it deliberately:
+#   curl -sI https://cdrdv2.intel.com/v1/dl/getContent/671200 | grep -i ^location
+# then set SDM_ORDER/SDM_ASSET from the result and re-run `fetch`.
+SDM_ORDER="325462-092US"                              # June 2026, 5363 pp
+SDM_ASSET="922475/325462-092-sdm-vol-1-2abcd-3abcd-4.pdf"
+# AMD64 APM, publication 40332 rev 4.08 (April 2024, 3347 pp). www.amd.com blocks scripted
+# fetch from here (http 000), exactly like the GPU ISA PDFs — hence the archive.org snapshot.
+APM_PUB="40332"
+
 RAW_KERNEL="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_REF}"
+RAW_KERNEL_X86="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_X86_REF}"
+RAW_PSABI="https://gitlab.com/x86-psABIs/x86-64-ABI/-/raw/${PSABI_COMMIT}/x86-64-ABI"
+RAW_MOO="https://raw.githubusercontent.com/dbalsom/moo/${MOO_COMMIT}"
+RAW_SS286="https://raw.githubusercontent.com/SingleStepTests/80286/${SS286_COMMIT}"
+SDM_URL="https://cdrdv2-public.intel.com/${SDM_ASSET}"
+APM_URL="https://web.archive.org/web/2id_/https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/${APM_PUB}.pdf"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -219,6 +245,60 @@ vulkan/vk.xml               ${RAW_VULKAN}/xml/vk.xml                   1000000
 # the console (TASK-357/362).
 vulkan/drawing.adoc         ${RAW_VULKAN}/chapters/drawing.adoc          50000
 vulkan/primsrast.adoc       ${RAW_VULKAN}/chapters/primsrast.adoc       100000
+
+# ===== x86 (serves x86jit) ==================================================================
+
+# --- Linux x86 syscall tables + the uapi headers that fix the process/signal layout.
+# SPDX on both .tbl files: \`GPL-2.0 WITH Linux-syscall-note\`. THESE ARE THE FIRST GPL-2.0
+# SOURCES VENDORED HERE. GPL-2.0 permits verbatim redistribution provided the licence and the
+# notices travel with the copy, which is why COPYING and the syscall-note exception text are
+# vendored beside them. Nothing else here is affected: every file keeps its own licence and
+# this repository relicenses nothing.
+# x86jit states 28 \`SYS_*\` constants and a separate i386 \`int 0x80\` table in
+# \`x86jit-linux/src/shim.rs\` with no citation at all; these two tables are that citation.
+linux-x86/COPYING                  ${RAW_KERNEL_X86}/COPYING                                    200
+linux-x86/LICENSES_exceptions_Linux-syscall-note ${RAW_KERNEL_X86}/LICENSES/exceptions/Linux-syscall-note 500
+linux-x86/syscall_64.tbl           ${RAW_KERNEL_X86}/arch/x86/entry/syscalls/syscall_64.tbl     5000
+linux-x86/syscall_32.tbl           ${RAW_KERNEL_X86}/arch/x86/entry/syscalls/syscall_32.tbl     5000
+# \`siginfo.h\` is what fixes si_addr's OFFSET: si_signo/si_errno/si_code, then \`union
+# __sifields\` whose \`_sigfault._addr\` is a \`void __user *\`, so natural LP64 alignment puts
+# it at 16 — the number \`x86jit-linux/src/sigsegv.rs\` hardcodes. \`sigcontext.h\` gives
+# \`struct sigcontext_64\`'s field ORDER, which is the order glibc's \`gregs[]\` (REG_RIP,
+# REG_ERR) indexes, and where the page-fault error code sits. What that error code's bit 1
+# MEANS is the SDM's job, not this header's.
+linux-x86/siginfo.h                ${RAW_KERNEL_X86}/include/uapi/asm-generic/siginfo.h         5000
+linux-x86/sigcontext.h             ${RAW_KERNEL_X86}/arch/x86/include/uapi/asm/sigcontext.h     5000
+
+# --- MOO ("Machine Opcode Operation File") — the binary container the SingleStepTests corpora
+# are published in. MIT, 435 KB whole, so the cited parts are vendored rather than fetched.
+# \`moo_format_v1.md\` is the specification; \`chunks.rs\` and \`registers_16.rs\` are the
+# reference implementation and a second witness to the chunk ids and to the REGS presence-
+# bitmask ordering that x86jit's hand-written parser (\`x86jit-tests/src/ss286.rs\`) has to
+# agree with — a hand parser and a spec disagreeing silently is exactly the failure this
+# stash exists to make visible.
+moo/LICENSE                        ${RAW_MOO}/LICENSE                                            500
+moo/README.md                      ${RAW_MOO}/README.md                                          500
+moo/moo_format_v1.md               ${RAW_MOO}/doc/moo_format_v1.md                             10000
+moo/chunks.rs                      ${RAW_MOO}/crates/moo/src/types/chunks.rs                    1000
+moo/registers_16.rs                ${RAW_MOO}/crates/moo/src/registers/registers_16.rs          5000
+
+# --- SingleStepTests 80286: the DOCUMENTATION is vendored, the 611 MB corpus is NOT.
+# Every normative claim a consuming harness rests on is in the README, not in the data —
+# \`PUSH SP\` pushes the PRE-push SP; D2/D3 do NOT mask CL (the CPU masks to 5 bits
+# internally); \`IN\` returns 0xFF/0xFFFF; an exception record carries \`flag_address\` so the
+# undefined FLAGS bits can be masked out of the memory compare; a revoked test is identified
+# by its HASH chunk against \`revocation_list.txt\`. All MIT and tiny, so the citations
+# survive upstream going away; the data does not need to.
+# \`revocation_list.txt\` is vendored for a second reason: x86jit's \`ss286::load_revocations\`
+# reads it from the corpus directory, but its \`fetch.sh\` never downloads it — so today the
+# revocation list is silently always empty and revoked tests are being trusted.
+# The corpus TREE is pinned by ${SS286_COMMIT} in MANIFEST.md and fetched by the consumer,
+# not here: 611 MB of test data is not a source anyone cites by section, and mirroring it
+# would make this stash a data host rather than a ledger.
+ss286/LICENSE                      ${RAW_SS286}/LICENSE                                          500
+ss286/README.md                    ${RAW_SS286}/README.md                                      10000
+ss286/CHANGELOG.md                 ${RAW_SS286}/CHANGELOG.md                                     200
+ss286/revocation_list.txt          ${RAW_SS286}/revocation_list.txt                              100
 EOF
 }
 
@@ -247,6 +327,39 @@ amd/rdna2-isa.pdf https://web.archive.org/web/20230214072857id_/https://develope
 # forbids republishing/distributing without written permission. The grant does not clearly
 # reach redistribution, so this stays fetch-only. See NOTICE.md.
 vulkan/spirv-core.html https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html 1000000
+
+# ===== x86 (serves x86jit) ==================================================================
+
+# --- x86 CPU manuals — © Intel / © AMD, no redistribution licence. Cite-only, kept local.
+# The Intel SDM is the primary authority for the whole lifter: instruction semantics, flag
+# effects, the x87 environment/tag-word images, exception behaviour. The pin is the
+# REVISION-specific cdrdv2 asset, never Intel's moving "latest" endpoint — see SDM_ORDER /
+# SDM_ASSET above for how to move it and why that matters for a citation.
+# ${SDM_ORDER}, June 2026, 5363 pp.
+intel/sdm.pdf     ${SDM_URL} 20000000
+# AMD64 APM volumes 1-5 (publication ${APM_PUB}, rev 4.08, April 2024, 3347 pp) — the SECOND
+# WITNESS where the SDM is silent or says "undefined", and the natural authority for the
+# Jaguar-class target x86jit's main consumer emulates. This is the CPU manual; the GPU ISA
+# manuals in \`amd/\` are a different processor entirely, hence the separate directory.
+# www.amd.com blocks scripted fetch from here (http 000), hence the archive.org snapshot.
+intel/amd64-apm.pdf ${APM_URL} 10000000
+
+# --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
+# sources @ ${PSABI_COMMIT}.
+# NOT VENDORED, and the reason is stronger than the SPIR-V one: that repository carries no
+# LICENSE and no COPYING file at all. The only licence statement in the whole tree is one
+# line in \`abi.tex\`'s revision history scoping CC-BY-4.0 to *Intel's changes*, not to the
+# document. For SPIR-V there is at least a document-wide grant that is merely ambiguous about
+# redistribution; here there is no document-wide grant to be ambiguous about. Fetch-only.
+# Pinned as SOURCE, not as the PDF: the README advertises a \`jobs/artifacts/master/raw\`
+# PDF, which is a CI artifact of the latest master build — it moves on every merge and GitLab
+# expires artifacts, so it cannot be pinned at all.
+# These two files carry every ABI fact x86jit currently states bare: §3.3.1 hardware
+# exception types (the exception->signal map), §3.4.1 initial stack and register state,
+# §3.4.3 the auxiliary vector (\`x86jit-elf\`'s \`setup_stack\`), §3.2 the calling sequence,
+# and A.2.1 the syscall calling convention (RDI/RSI/RDX/R10/R8/R9 — note R10, not RCX).
+psabi/low-level-sys-info.tex ${RAW_PSABI}/low-level-sys-info.tex 50000
+psabi/kernel.tex             ${RAW_PSABI}/kernel.tex              1000
 EOF
 }
 
@@ -712,7 +825,10 @@ HEAD
   printf '| Linux kernel — AMD `radeon`/`amdgpu` register + PM4 headers (`amd/kernel-*`) | https://github.com/torvalds/linux | `%s` | MIT (per-file: "Permission is hereby granted, free of charge…", © Advanced Micro Devices, Inc. 2010–2019). The kernel as a whole is GPL-2.0; these particular files carry AMD'"'"'s MIT notice, which is preserved verbatim in each copy. |\n' "$KERNEL_REF"
   printf '| FreeBSD 9.0 — syscall/errno/ELF/mman/kqueue sources (`freebsd9/`) | https://github.com/freebsd/freebsd-src | `%s` | BSD-2-Clause / BSD-3-Clause, © The Regents of the University of California and others; licence text vendored as `freebsd9/COPYRIGHT`, per-file notices preserved. |\n' "$FREEBSD_REF"
   printf '| Vulkan specification — chapters, appendices and the registry (`vulkan/*.adoc`, `vulkan/vk.xml`) | https://github.com/KhronosGroup/Vulkan-Docs | `%s` | The `.adoc` files: **CC-BY-4.0**, © 2015-2025 The Khronos Group Inc. (SPDX header in each file). `vk.xml`: **Apache-2.0 OR MIT**, same copyright. Licence text vendored as `vulkan/LICENSE.adoc`; full CC-BY-4.0 at https://creativecommons.org/licenses/by/4.0/. Unmodified. |\n' "$VULKAN_DOCS_REF"
-  printf '| Mesa — `src/amd` (common, registers, addrlib, llvm, compiler) and `src/gallium/drivers/radeonsi` (`mesa/mesa/`) | %s | `%s` | **MIT**, © Advanced Micro Devices, Inc., Red Hat, VMware, Valve and other Mesa contributors (SPDX header in each file). Licence text vendored as `mesa/mesa/licenses/MIT` and `mesa/mesa/docs/license.rst`. |\n\n' "$MESA_URL" "$MESA_COMMIT"
+  printf '| Mesa — `src/amd` (common, registers, addrlib, llvm, compiler) and `src/gallium/drivers/radeonsi` (`mesa/mesa/`) | %s | `%s` | **MIT**, © Advanced Micro Devices, Inc., Red Hat, VMware, Valve and other Mesa contributors (SPDX header in each file). Licence text vendored as `mesa/mesa/licenses/MIT` and `mesa/mesa/docs/license.rst`. |\n' "$MESA_URL" "$MESA_COMMIT"
+  printf '| Linux kernel — x86 syscall tables and process/signal uapi headers (`linux-x86/`) | https://github.com/torvalds/linux | `%s` | **GPL-2.0 WITH Linux-syscall-note** (SPDX header in each file). Licence text vendored as `linux-x86/COPYING` and `linux-x86/LICENSES_exceptions_Linux-syscall-note`. See the GPL-2.0 note below. |\n' "$KERNEL_X86_REF"
+  printf '| MOO — the SingleStepTests container format: spec + reference parser (`moo/`) | https://github.com/dbalsom/moo | `%s` | **MIT**, © Daniel Balsom. Licence text vendored as `moo/LICENSE`. |\n' "$MOO_COMMIT"
+  printf '| SingleStepTests 80286 — documentation and revocation list only, **not** the corpus (`ss286/`) | https://github.com/SingleStepTests/80286 | `%s` | **MIT**, © Daniel Balsom. Licence text vendored as `ss286/LICENSE`. The 611 MB corpus itself is fetched by the consumer at this same pin, not mirrored here. |\n\n' "$SS286_COMMIT"
 
   cat <<'MIT'
 ### MIT licence text (Mesa, and the AMD kernel headers)
@@ -746,6 +862,30 @@ contents are not approved or reviewed by, The Khronos Group.
 
 MIT
 
+  cat <<'GPL2'
+
+### GPL-2.0 WITH Linux-syscall-note (the `linux-x86/` tables and uapi headers)
+
+These are the first copyleft-licensed sources vendored here, so the reasoning is worth
+stating rather than assuming. GPL-2.0 **permits verbatim redistribution** — §1, "You may
+copy and distribute verbatim copies of the Program's source code as you receive it" —
+provided the copyright notice and the licence travel with the copy. They do: each file keeps
+its `SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note` header, and both licence texts
+are vendored beside them as `linux-x86/COPYING` and
+`linux-x86/LICENSES_exceptions_Linux-syscall-note`.
+
+The syscall-note exception is what makes these safe to *consult* from a permissively-licensed
+project at all. In the kernel's own words: "this exception does not invalidate any other
+reasons why the code file might be covered by the GNU General Public License", but user-space
+code that merely uses the kernel's syscall interface is "not considered a derived work" of
+the kernel.
+
+**Nothing else in this repository is affected.** Every vendored file keeps the licence it
+arrived under; there is no combined work here, only a stash of separately-licensed documents
+sitting in adjacent directories. Copying a file out means complying with *that file's*
+licence.
+GPL2
+
   printf '## NOT vendored — fetch-only, pinned by sha256 in `SHA256SUMS.fetched`\n\n'
   cat <<'FETCHONLY'
 These are downloaded by `./fetch-oracles.sh fetch` into a gitignored working copy. Their
@@ -757,6 +897,9 @@ compare. They are not redistributed from here:
 | AMD ISA manuals — `amd/ci-isa.pdf` (Sea Islands), `amd/si-isa.pdf` (Southern Islands), `amd/rdna2-isa.pdf` (RDNA 2) | © AMD, published with **no redistribution licence**. Cite-only. Non-negotiable: these must never be committed. |
 | SPIR-V core specification — `vulkan/spirv-core.html` | Khronos specification copyright. It grants "a conditional copyright license to use and reproduce the unmodified Specification", immediately after a sentence that separately forbids the copy being "reproduced, republished, distributed, transmitted, displayed, broadcast or otherwise exploited" without written permission. The grant does not clearly extend to redistribution, so the safe reading is fetch-only. (Its pin is taken over the document with the CDN-injected challenge-script line removed — `registry.khronos.org` rewrites that line on every request, so the raw bytes are not reproducible and a raw sha256 pin could never be checked.) |
 | OpenOrbis PS4 Toolchain — `openorbis/` | GPL-3.0, so redistribution would be *legal*. It is fetch-only for two other reasons: the clone is ~169 MB for a handful of headers plus the OELF/SELF spec, and the provenance quarantine (`MANIFEST.md`) **rewrites** one of its headers — a vendored copy would be a modified redistribution, which is exactly the thing this stash exists to avoid. Pinned by commit. |
+| Intel SDM — `intel/sdm.pdf` (combined volumes 1, 2A-D, 3A-D, 4) | © Intel Corporation, published with **no redistribution licence**. Cite-only, same class as the AMD ISA manuals. Pinned by order number *and* sha256, because Intel's download endpoint always serves the newest revision. |
+| AMD64 APM — `intel/amd64-apm.pdf` (volumes 1-5) | © Advanced Micro Devices, Inc., **no redistribution licence**. Cite-only. This is the x86-64 CPU manual, distinct from the GPU ISA manuals in `amd/`. |
+| x86-64 psABI — `psabi/*.tex` | The upstream repository (gitlab.com/x86-psABIs/x86-64-ABI) carries **no `LICENSE` and no `COPYING` file at all**. The only licence statement in its tree is one line in `abi.tex`'s revision history scoping CC-BY-4.0 to *Intel's changes*, not to the document. That is weaker than the SPIR-V case above: there, a document-wide grant exists and is merely ambiguous about redistribution; here there is no document-wide grant to be ambiguous about. Fetch-only, pinned by commit, taken as LaTeX source — the PDF upstream advertises is a CI artifact of the latest master build and expires, so it cannot be pinned. |
 FETCHONLY
 }
 

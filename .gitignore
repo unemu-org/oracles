@@ -30,12 +30,23 @@
 !mesa/mesa/docs/license.rst
 !mesa/mesa/licenses/
 !mesa/mesa/licenses/MIT
+# x86 section (serves x86jit).
+!linux-x86/
+!linux-x86/*
+!moo/
+!moo/*
+!ss286/
+!ss286/*
 
 # --- NEVER committed (restated after the allow-list, so it wins) ---
 # AMD ISA PDFs: © AMD, no redistribution licence.
 amd/*.pdf
 # SPIR-V core spec: Khronos specification copyright, no clear redistribution grant.
 vulkan/spirv-core.html
+# x86 CPU manuals: © Intel / © AMD, no redistribution licence.
+intel/*.pdf
+# x86-64 psABI: the upstream repository carries no licence file at all.
+psabi/
 # OpenOrbis clone: fetch-only (169 MB, and the provenance quarantine modifies it).
 openorbis/
 # Upstream scratch clones used by `fetch` and `verify --upstream`.

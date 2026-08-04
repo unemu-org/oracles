@@ -1,7 +1,20 @@
-# unemups4 clean-oracle stash — MANIFEST
+# clean-oracle stash — MANIFEST
 
-Pinned, checksummed clean sources for the provenance-derivation ledger (doc-9).
-The unemups4 ledger cites entries here by **name + version/commit + sha256 + section**.
+Pinned, checksummed clean sources for the provenance-derivation ledgers that cite them.
+A ledger cites entries here by **name + version/commit + sha256 + section**.
+
+Two projects draw on this stash, and their sources are grouped separately:
+
+- **unemups4** (PS4 emulation) — the AMD GPU ISA manuals, the kernel `radeon`/`amdgpu`
+  register headers, Mesa, Vulkan, SPIR-V, OpenOrbis, FreeBSD 9.0. The original consumer; its
+  sections below are unchanged and the doc-9 ledger references still resolve.
+- **x86jit** (x86-64 → host recompiler) — the Intel SDM and AMD64 APM, the x86-64 psABI, the
+  Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
+  its MOO container format. See **x86 sources** below.
+
+The pins are deliberately independent: `KERNEL_REF` (GPU headers) and `KERNEL_X86_REF`
+(syscall tables) are separate variables even while they hold the same tag, so bumping one
+consumer's ledger never silently moves the other's citations.
 
 Every source here is in one of exactly two states, and each entry below says which:
 
@@ -242,6 +255,115 @@ there is no way to ask this `mmap` to *refuse* on collision. Consequence for the
 preserves the bytes already committed there — is a *named divergence*, because FreeBSD would
 replace the mapping and an anonymous replacement yields zero-filled pages. See
 `crates/kernel/src/process.rs::map_direct_memory_at`.
+
+---
+
+# x86 sources (serve x86jit)
+
+x86jit is an x86-64 → host recompiler. Unlike the PS4 GPU, x86-64 is a *documented*
+architecture, so the provenance problem has a different shape: the primary source exists and
+is authoritative, and the failure mode is not "nobody wrote it down" but **citing it too
+vaguely to check**. Before this section the engine carried 562 internal `§spec` references
+against ~55 mentions of "the SDM", only five of which named a volume and a section, and three
+URLs in the entire source tree. These entries are what a precise citation points at.
+
+The other half is the differential oracle. x86jit compares against Unicorn (QEMU) and against
+the host CPU, and the tree already records ~20 places where **QEMU is wrong and hardware
+agrees with the engine** — so an oracle here is a *comparand, not an authority*, and the
+manuals below are what settles the disagreement.
+
+## x86 CPU manuals (instruction semantics, flags, exception behaviour) — **FETCH-ONLY**
+
+| File | Title | Pages | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `intel/sdm.pdf` | Intel® 64 and IA-32 Architectures Software Developer's Manual, Combined Volumes 1, 2A-2D, 3A-3D, 4 (Order Number 325462-092US, June 2026) | 5363 | `16a9336104750613ae2f2bab6eb7a1b21a7e1ef60ced35e9ab2e0d8c7efcec68` | © Intel (cite-only) | **The primary authority for the whole lifter.** Vol 1 §4.8.4 rounding control; Vol 1 §8.1.7 the x87 tag word; Vol 1 Figure 8-9 the 28-byte `FNSTENV` environment image; Vol 2 the per-instruction pages (`FISUB`/`FIDIV` operand order, `SHUFPS` lane selection, `VEXTRACTF128`); Vol 3 the page-fault error code |
+| `intel/amd64-apm.pdf` | AMD64 Architecture Programmer's Manual, Volumes 1-5 (Publication 40332, Revision 4.08, April 2024) | 3347 | `6f044603aded1010e981c04ce5ec9e558719d7072e336a80651c49f8904e4cb7` | © AMD (cite-only) | **Second witness** where the SDM is silent or says "undefined" — and the natural authority for the Jaguar-class (x86-64-v2) target x86jit's main consumer emulates. This is the CPU manual; the GPU ISA manuals in `amd/` are a different processor |
+
+- Source (SDM): `https://cdrdv2-public.intel.com/922475/325462-092-sdm-vol-1-2abcd-3abcd-4.pdf`.
+  Intel's advertised endpoint `cdrdv2.intel.com/v1/dl/getContent/671200` **301s to whatever
+  the newest revision is**, so it is not a pin. The pin is the revision-specific asset above,
+  recorded together with the order number so a reader can tell *which* document a citation
+  meant after Intel publishes 093. To move it deliberately:
+  `curl -sI https://cdrdv2.intel.com/v1/dl/getContent/671200 | grep -i ^location`, then set
+  `SDM_ORDER`/`SDM_ASSET` in `fetch-oracles.sh` and re-run `fetch`.
+- Source (APM): archive.org snapshot of
+  `www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/40332.pdf`
+  — `www.amd.com` blocks scripted fetch from here (http 000), the same obstacle the GCN ISA
+  PDFs hit.
+- **The SDM is the primary** oracle. Cite the APM when it disambiguates something the SDM
+  leaves undefined, or when a Jaguar-specific behaviour is at issue — and say which manual
+  you are citing, because "undefined" in one is not "undefined" in the other.
+
+## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
+
+System V ABI, AMD64 Architecture Processor Supplement, LaTeX sources from
+`gitlab.com/x86-psABIs/x86-64-ABI` @ commit
+**`e1ce098331da5dbd66e1ffc74162380bcc213236`** (2025-03-12).
+
+| File | sha256 | Covers |
+|---|---|---|
+| `psabi/low-level-sys-info.tex` | `2d42f2ab76b99a3b8456e6bc07e18314e85991119f72db90ca1175328e27b705` | §3.2 function calling sequence (register roles, stack frame, red zone); §3.3.1 hardware exception types — the exception→signal map `x86jit-linux/src/sigsegv.rs` implements; §3.4.1 initial stack and register state; §3.4.3 the auxiliary vector — both built by `x86jit-elf`'s `setup_stack` |
+| `psabi/kernel.tex` | `f4756c5f1103de96e0f91fc663d7f089b06789d9a8d796ec0b3e5097f368f1c7` | A.2.1 the syscall calling convention: arguments in RDI, RSI, RDX, **R10**, R8, R9 — *not* RCX, which the `syscall` instruction clobbers. The one fact most likely to be mis-stated from memory |
+
+**Not vendored, and the reason is stronger than the SPIR-V one.** That repository carries no
+`LICENSE` and no `COPYING` file at all. The only licence statement in its entire tree is one
+line in `abi.tex`'s revision history, scoping CC-BY-4.0 to *Intel's changes* — not to the
+document. For SPIR-V a document-wide grant exists and is merely ambiguous about
+redistribution; here there is no document-wide grant to be ambiguous about.
+
+**Pinned as source, not as the PDF.** The upstream README advertises
+`.../jobs/artifacts/master/raw/x86-64-ABI/abi.pdf?job=build`, which is a CI artifact of the
+latest master build: it moves on every merge and GitLab expires artifacts. It cannot be
+pinned at all. The `.tex` at a commit is immutable, greppable and diffable.
+
+## Linux x86 syscall tables + process/signal uapi (x86jit's OS surface) — **VENDORED**
+
+From `torvalds/linux` @ tag **`v6.12`**. License: **GPL-2.0 WITH Linux-syscall-note** (SPDX
+header in each file). These are the **first copyleft sources vendored in this stash** — GPL-2.0
+§1 permits verbatim redistribution provided the notices travel with the copy, so both licence
+texts are vendored alongside. See `NOTICE.md` for the full reasoning.
+
+| File | Origin | sha256 | Covers |
+|---|---|---|---|
+| `linux-x86/syscall_64.tbl` | `arch/x86/entry/syscalls/syscall_64.tbl` | `980ce3115028c71c5618e7864d262017bde8103bcfe7b413147a14fd312c92ac` | The x86-64 syscall numbers. `x86jit-linux/src/shim.rs` states 28 `SYS_*` constants with no citation at all; this is that citation |
+| `linux-x86/syscall_32.tbl` | `arch/x86/entry/syscalls/syscall_32.tbl` | `48deaff56363a5889acd966b5a9df8cf084e8951c45fddd7a2f33f3b8bc4d81d` | The i386 `int 0x80` numbers — a *different* table, which is exactly why the shim keeps a separate one for its Compat32 mode |
+| `linux-x86/siginfo.h` | `include/uapi/asm-generic/siginfo.h` | `18625c075e9ee00c53f0389f50bfca3b85da648bb994383acfc106c5dde5dce0` | Fixes `si_addr`'s **offset**: `si_signo`/`si_errno`/`si_code`, then `union __sifields` whose `_sigfault._addr` is a `void __user *` — natural LP64 alignment puts it at 16, the number `sigsegv.rs` hardcodes |
+| `linux-x86/sigcontext.h` | `arch/x86/include/uapi/asm/sigcontext.h` | `84e2cf444ec6a539a4bc0b46717775cb1fd1f591301b7469ba143e56f43afc0c` | `struct sigcontext_64`'s field **order** — the order glibc's `gregs[]` (`REG_RIP`, `REG_ERR`) indexes, and where the page-fault error code sits. What bit 1 of that code *means* is the SDM's job, not this header's |
+| `linux-x86/COPYING` | `COPYING` | `fb5a425bd3b3cd6071a3a9aff9909a859e7c1158d54d32e07658398cd67eb6a0` | Licence text (travels with the copies) |
+| `linux-x86/LICENSES_exceptions_Linux-syscall-note` | `LICENSES/exceptions/Linux-syscall-note` | `8e378ab93586eb55135d3bc119cce787f7324f48394777d00c34fa3d0be3303f` | The exception that makes user-space use of the syscall interface not a derived work |
+
+## SingleStepTests 80286 (hardware-captured differential oracle) — **VENDORED docs / FETCH-ONLY corpus**
+
+A per-instruction test corpus for the Intel 80286, by **Daniel Balsom**, captured from a real
+**Harris N80C286-12** through the ArduinoX86 CPU-to-Arduino interface — i.e. ground truth from
+silicon, not from another emulator. `SingleStepTests/80286` @ commit
+**`37c73caf53dcd22d3dd369ff09305d13d117a4fe`** (2025-11-02). MIT.
+
+The **documentation is vendored; the 611 MB corpus is not.** Every normative claim a consuming
+harness rests on lives in the README, not in the data — and 611 MB of test vectors is not a
+source anyone cites by section. Mirroring it would make this stash a data host rather than a
+ledger. The consumer (`x86jit-tests/vendor/80286/fetch.sh`) fetches the corpus itself at this
+same pin.
+
+| File | Origin | sha256 | Covers |
+|---|---|---|---|
+| `ss286/README.md` | `README.md` | `0381eb13604e5b2cea6f3ede348146d28d129b8f5f6d4af3668cc54be83bf025` | The normative claims: `PUSH SP` pushes the **pre-push** SP; `D2`/`D3` do **not** mask CL (the CPU masks to 5 bits internally); `IN` returns `0xFF`/`0xFFFF`; an exception record carries `flag_address` so undefined FLAGS bits can be masked out of the memory compare; a revoked test is identified by its `HASH` chunk |
+| `ss286/revocation_list.txt` | `revocation_list.txt` | `219381caae2bd5f86d616fd9ee7309193c1dc254589ef032c0059dd42db3716f` | The revoked-test hashes. **Vendored for a second reason:** x86jit's `ss286::load_revocations` reads this from the corpus directory, but its `fetch.sh` never downloads it — so today the revocation list is silently always empty and revoked tests are being trusted |
+| `ss286/CHANGELOG.md` | `CHANGELOG.md` | `5efd9f33316ea637f551a2662257cac0d5939ffc242bfa6252d0f5debe42cfc2` | Which corpus revision changed what — needed to tell a real regression from a corpus correction |
+| `ss286/LICENSE` | `LICENSE` | `17169beea9b37538e699029d724687acf89182988b78f5ddce0f65a01db14653` | MIT text (travels with the copies) |
+
+## MOO — the corpus's binary container (`dbalsom/moo`) — **VENDORED**
+
+`dbalsom/moo` @ commit **`c438962d2b30856817d8e59bd5f0f4c628596ca8`** (2025-11-19). MIT,
+435 KB whole, so the cited parts are vendored rather than fetched.
+
+| File | Origin | sha256 | Covers |
+|---|---|---|---|
+| `moo/moo_format_v1.md` | `doc/moo_format_v1.md` | `72187464b34c255e413b24a127adcce2fb87996e86d2f33999e5b7047f5b636f` | The format specification — chunk framing and ids |
+| `moo/chunks.rs` | `crates/moo/src/types/chunks.rs` | `05a1760cbd1cfb904d481bb6e41ca86fc85c4817c6c351fbb9f308739a2b6b0b` | Reference implementation of the chunk ids — a **second witness** to the spec |
+| `moo/registers_16.rs` | `crates/moo/src/registers/registers_16.rs` | `a3a22d25bbc93d6041463dba7cec01ca2f51ff9d8e8f7f34cb4d8a04f1468a33` | The `REGS` presence-bitmask **ordering**, which x86jit's hand-written parser (`x86jit-tests/src/ss286.rs`) must agree with. A hand parser and a spec disagreeing silently is precisely the failure this stash exists to make visible |
+| `moo/README.md` | `README.md` | `8fe54f83e1780149f727a9f64810ee773a6bfa2d18f63b7175c5f57f5dbb3883` | Format overview |
+| `moo/LICENSE` | `LICENSE` | `17169beea9b37538e699029d724687acf89182988b78f5ddce0f65a01db14653` | MIT text |
 
 ---
 
