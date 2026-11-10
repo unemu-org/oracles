@@ -58,6 +58,10 @@ SDM_ASSET="922475/325462-092-sdm-vol-1-2abcd-3abcd-4.pdf"
 # AMD64 APM, publication 40332 rev 4.08 (April 2024, 3347 pp). www.amd.com blocks scripted
 # fetch from here (http 000), exactly like the GPU ISA PDFs — hence the archive.org snapshot.
 APM_PUB="40332"
+# Intel 80386 Programmer's Reference Manual, order number 230985-001 (1986). bitsavers.org
+# answers scripted fetch without a browser user agent with http 403; its trailing-edge.com
+# mirror serves the byte-identical file (same sha256), so the mirror is the pin.
+I386PRM_ORDER="230985-001"
 
 RAW_KERNEL="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_REF}"
 RAW_KERNEL_X86="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_X86_REF}"
@@ -66,6 +70,7 @@ RAW_MOO="https://raw.githubusercontent.com/dbalsom/moo/${MOO_COMMIT}"
 RAW_SS286="https://raw.githubusercontent.com/SingleStepTests/80286/${SS286_COMMIT}"
 SDM_URL="https://cdrdv2-public.intel.com/${SDM_ASSET}"
 APM_URL="https://web.archive.org/web/2id_/https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/${APM_PUB}.pdf"
+I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM_ORDER}_80386_Programmers_Reference_Manual_1986.pdf"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -343,6 +348,12 @@ intel/sdm.pdf     ${SDM_URL} 20000000
 # manuals in \`amd/\` are a different processor entirely, hence the separate directory.
 # www.amd.com blocks scripted fetch from here (http 000), hence the archive.org snapshot.
 intel/amd64-apm.pdf ${APM_URL} 10000000
+# Intel 80386 Programmer's Reference Manual (${I386PRM_ORDER}, 1986, 523 pp, a scan with an OCR
+# text layer) — the SECOND WITNESS for 386-specific behaviour that the current SDM no longer
+# describes as a 386 feature set: CR0 and EFLAGS masks, two-level paging permissions and
+# reserved bits, reset state. x86jit's decision-18 requires it before any such fact is
+# implemented. © Intel, no redistribution licence: cite-only, like the SDM.
+intel/i386-prm.pdf ${I386PRM_URL} 20000000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.
