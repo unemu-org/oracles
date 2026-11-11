@@ -63,6 +63,11 @@ APM_PUB="40332"
 # mirror serves the byte-identical file (same sha256), so the mirror is the pin.
 I386PRM_ORDER="230985-001"
 I286PRM_ORDER="210498-005"   # 80286 and 80287 Programmer's Reference Manual (1987); same mirror rule
+# Intel 8080 manuals for x80; same mirror rule. ORDER is the order number printed on the
+# document itself. The mirror files the assembly-language manual as revision "9800301D";
+# its title page prints 9800301-04 (May 1981 printing), so that URL cannot reuse ORDER.
+I8080UM_ORDER="98-153B"       # 8080 Microcomputer Systems User's Manual (September 1975)
+I8080ALPM_ORDER="9800301-04"  # 8080/8085 Assembly Language Programming Manual (May 1981)
 
 RAW_KERNEL="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_REF}"
 RAW_KERNEL_X86="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_X86_REF}"
@@ -73,6 +78,8 @@ SDM_URL="https://cdrdv2-public.intel.com/${SDM_ASSET}"
 APM_URL="https://web.archive.org/web/2id_/https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/${APM_PUB}.pdf"
 I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM_ORDER}_80386_Programmers_Reference_Manual_1986.pdf"
 I286PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80286/${I286PRM_ORDER}_80286_and_80287_Programmers_Reference_Manual_1987.pdf"
+I8080UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/${I8080UM_ORDER}_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf"
+I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -361,6 +368,17 @@ intel/i386-prm.pdf ${I386PRM_URL} 20000000
 # mode entry, 286 descriptor format) and the 80287 coprocessor that the current SDM does not
 # describe. © Intel, no redistribution licence: cite-only, like the SDM.
 intel/i286-prm.pdf ${I286PRM_URL} 20000000
+# --- 8080 CPU manuals (x80) — © Intel, no redistribution licence. Cite-only, kept local.
+# Intel 8080 Microcomputer Systems User's Manual (${I8080UM_ORDER}, September 1975, 262 pp, a
+# scan with an OCR text layer) — x80's PRIMARY: the CPU chapter (interrupt, halt and start-up
+# sequences, the per-instruction machine-cycle/state table), the instruction set with flag
+# effects, and the 8080A data sheet.
+intel/i8080-um.pdf ${I8080UM_URL} 20000000
+# Intel 8080/8085 Assembly Language Programming Manual (${I8080ALPM_ORDER}, May 1981, 222 pp, a
+# scan with an OCR text layer; the mirror files it as revision "9800301D") — x80's SECOND
+# WITNESS: per-opcode cycles and states, interrupts, flag notes. 7.15 MB, hence the smaller
+# minimum size.
+intel/i8080-alpm.pdf ${I8080ALPM_URL} 5000000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.

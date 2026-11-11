@@ -3,7 +3,7 @@
 Pinned, checksummed clean sources for the provenance-derivation ledgers that cite them.
 A ledger cites entries here by **name + version/commit + sha256 + section**.
 
-Two projects draw on this stash, and their sources are grouped separately:
+Three projects draw on this stash, and their sources are grouped separately:
 
 - **unemups4** (PS4 emulation) — the AMD GPU ISA manuals, the kernel `radeon`/`amdgpu`
   register headers, Mesa, Vulkan, SPIR-V, OpenOrbis, FreeBSD 9.0. The original consumer; its
@@ -11,6 +11,8 @@ Two projects draw on this stash, and their sources are grouped separately:
 - **x86jit** (x86-64 → host recompiler) — the Intel SDM and AMD64 APM, the x86-64 psABI, the
   Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
   its MOO container format. See **x86 sources** below.
+- **x80** (Intel 8080-family interpreter) — the Intel 8080 user's manual and the 8080/8085
+  assembly-language manual. See **8080 CPU manuals** below.
 
 The pins are deliberately independent: `KERNEL_REF` (GPU headers) and `KERNEL_X86_REF`
 (syscall tables) are separate variables even while they hold the same tag, so bumping one
@@ -297,6 +299,22 @@ manuals below are what settles the disagreement.
 - **The SDM is the primary** oracle. Cite the APM when it disambiguates something the SDM
   leaves undefined, or when a Jaguar-specific behaviour is at issue — and say which manual
   you are citing, because "undefined" in one is not "undefined" in the other.
+
+## 8080 CPU manuals (instruction semantics, flags, timing, interrupts) — **FETCH-ONLY**
+
+| File | Title | Pages | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `intel/i8080-um.pdf` | Intel 8080 Microcomputer Systems User's Manual (Order Number 98-153B, September 1975) | 262 | `d5982f96536b1dbecbeff409d2370970638716296dce7b318624d86221597a9e` | © Intel (cite-only) | **x80's primary source.** Ch. 2 the CPU: status bits (Table 2-1, p. 2-6), interrupt sequences (p. 2-11), halt and start-up sequences (p. 2-13), the per-instruction machine-cycle/state table with notes (pp. 2-16 to 2-20); Ch. 4 the instruction set: flags (p. 4-3), per-instruction flag effects and cycles, the summary (p. 4-15); Ch. 5 the 8080A data sheet (pp. 5-13 to 5-19). Printed page 2-n is PDF page 14+n; 4-n is PDF page 44+n. A 1975 scan with a noisy OCR text layer: check a cited value against the page image |
+| `intel/i8080-alpm.pdf` | Intel 8080/8085 Assembly Language Programming Manual (Order Number 9800301-04, May 1981; the mirror files it as revision "9800301D") | 222 | `c2f17d613159b624cf7226b0b9200192a49ff172147d88f56d50f45e94691643` | © Intel (cite-only) | **x80's second witness**, written separately from the user's manual: condition flags (pp. 1-9 to 1-12), the alphabetical instruction dictionary with cycles and states for every opcode (Ch. 3), interrupts (Ch. 7), the instruction summary (App. A). Printed page 1-n is PDF page 10+n; 3-n is PDF page 54+n. A scan with an OCR text layer: check a cited value against the page image |
+
+- Source (user's manual): `http://bitsavers.trailing-edge.com/components/intel/MCS80/98-153B_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf`.
+- Source (assembly-language manual): `http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf`.
+  The order number and date come from the title page, not the file name.
+- Both are mirrors of bitsavers.org; byte identity with bitsavers.org itself is not verified.
+- The two manuals disagree on at least one fact: the auxiliary-carry flag after the 8080
+  logical AND instructions (user's manual p. 4-9 versus assembly-language manual p. 1-12).
+  x80 records and settles such disagreements in its own `PROVENANCE.md`; this stash only
+  pins the sources.
 
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 

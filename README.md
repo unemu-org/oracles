@@ -61,8 +61,8 @@ corpus** (MIT, so it legally could be — but it is 611 MB of test vectors, whic
 fetch, not a source anyone cites by section). Their hashes/commits are committed, so those
 citations stay checkable too: fetch the source yourself and compare.
 
-Two projects cite this stash: **unemups4** (PS4 emulation) and **x86jit** (an x86-64 → host
-recompiler). Their sources are grouped separately in `MANIFEST.md`, and their pins are held in
+Three projects cite this stash: **unemups4** (PS4 emulation), **x86jit** (an x86-64 → host
+recompiler) and **x80** (an Intel 8080-family interpreter). Their sources are grouped separately in `MANIFEST.md`, and their pins are held in
 separate variables so bumping one never moves the other's citations.
 
 `NOTICE.md` carries the full table with licence, URL and pinned ref for every entry.
