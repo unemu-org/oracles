@@ -68,6 +68,10 @@ I286PRM_ORDER="210498-005"   # 80286 and 80287 Programmer's Reference Manual (19
 # its title page prints 9800301-04 (May 1981 printing), so that URL cannot reuse ORDER.
 I8080UM_ORDER="98-153B"       # 8080 Microcomputer Systems User's Manual (September 1975)
 I8080ALPM_ORDER="9800301-04"  # 8080/8085 Assembly Language Programming Manual (May 1981)
+# NEC V20/V30 user's manual for x86jit's V20/V30 models and their 8080 emulation mode; same
+# mirror rule. STOCK is the stock number printed on the title page; the mirror's file name
+# does not carry it.
+NECV20UM_STOCK="500350"      # uPD70108 (V20) and uPD70116 (V30) User's Manual (October 1986)
 
 RAW_KERNEL="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_REF}"
 RAW_KERNEL_X86="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_X86_REF}"
@@ -84,6 +88,7 @@ I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301
 I8085UM_ORDER="205775-002"   # MCS-80/85 Family User's Manual (January 1983)
 I8085UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/MCS80_85_Users_Manual_Jan83.pdf"
 IECH1988_URL="http://bitsavers.trailing-edge.com/components/intel/_dataBooks/1988_Intel_Embedded_Controller_Handbook_Volume_I_8-Bit.pdf"
+NECV20UM_URL="http://bitsavers.trailing-edge.com/components/nec/V-Series/V20_V30_Users_Manual_Oct86.pdf"
 # 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
 CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
@@ -410,6 +415,13 @@ intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
 # 20151108135453 of his 8080/8085 CPU Exerciser page, 4 pp): the per-chip table of measured
 # CRCs from which 8080EXM's expected values come, with contributor notes. No licence: cite-only.
 8080-exercisers/8080-8085-cpu-exerciser-results.pdf ${CPU8080_TESTS_URL}/8080_8085%20CPU%20Exerciser.pdf 100000
+# --- NEC V20/V30 manual (x86jit) — (c) NEC Electronics, no redistribution licence. Cite-only,
+# kept local. uPD70108 (V20) and uPD70116 (V30) User's Manual (stock no. ${NECV20UM_STOCK},
+# October 1986, 228 pp, a scan with an OCR text layer) — the PRIMARY source for the V20/V30
+# models: the native and 8080 emulation modes (BRKEM, CALLN, RETEM, the MD flag), the
+# V-series instruction-set extensions, interrupts and reset. 10.8 MB, hence the smaller
+# minimum size.
+nec/v20-v30-um.pdf ${NECV20UM_URL} 5000000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.

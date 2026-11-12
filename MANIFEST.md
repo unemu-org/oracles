@@ -10,7 +10,8 @@ Three projects draw on this stash, and their sources are grouped separately:
   sections below are unchanged and the doc-9 ledger references still resolve.
 - **x86jit** (x86-64 → host recompiler) — the Intel SDM and AMD64 APM, the x86-64 psABI, the
   Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
-  its MOO container format. See **x86 sources** below.
+  its MOO container format, and the NEC V20/V30 user's manual. See **x86 sources** and
+  **NEC V20/V30 manual** below.
 - **x80** (Intel 8080-family interpreter) — the Intel 8080 user's manual and the 8080/8085
   assembly-language manual, the 8085 sources, and two 8080 CPU exercisers as oracles. See
   **8080 CPU manuals**, **8085 CPU sources** and **8080 CPU exercisers** below.
@@ -356,6 +357,20 @@ manuals below are what settles the disagreement.
   results PDF records which parts the expected CRCs were reported for (contributor reports on
   the author's page, not Intel documentation); x80 cites it before treating a mismatch as a
   defect.
+
+## NEC V20/V30 manual (V-series models, 8080 emulation mode) — **FETCH-ONLY**
+
+| File | Title | Pages | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `nec/v20-v30-um.pdf` | NEC Electronics µPD70108 (V20) and µPD70116 (V30) User's Manual (Stock No. 500350, October 1986) | 228 | `8252fe5ddc0623380b7f28819009e6bb7d2b8e345ef347d9e6f2d299ce97865f` | © NEC Electronics (cite-only) | **x86jit's primary source for the V20/V30 models.** Section 3 the functional description, with the PSW and its MD (mode) flag (p. 3-3); Section 6 interrupts and their sources, BRKEM among them (pp. 6-1 to 6-4); Section 7 reset; Section 8 the native and µPD8080AF emulation modes: entering 8080 mode with BRKEM and leaving it with RETEM, calling a native-mode routine from 8080 mode with CALLN (returned from with RETI), NMI and INT during emulation, and the MD flag across each switch (pp. 8-1 to 8-5); Section 12 the instruction set, including the V-series extensions and the emulation-mode instructions (p. 12-176). Printed page 3-n is PDF page 13+n; 6-n is PDF page 25+n; 8-n is PDF page 31+n; 12-n is PDF page 45+n. A scan with an OCR text layer (Paper Capture, 2011): check a cited value against the page image |
+
+- Source: `http://bitsavers.trailing-edge.com/components/nec/V-Series/V20_V30_Users_Manual_Oct86.pdf`,
+  a mirror of bitsavers.org. Byte identity with bitsavers.org itself is not verified: it does
+  not serve the file to a scripted fetch.
+- The stock number and date come from the title page, not the file name.
+- The 8080 emulation mode executes the 8080 instruction set. x86jit's V20/V30 models own the
+  mode switch and the MD flag; the 8080 instruction semantics are x80's, cited from the
+  **8080 CPU manuals** above.
 
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 
