@@ -3,6 +3,7 @@
 # vulkan/spirv-core.html is hashed with the CDN-injected challenge script line
 # ('__CF$cv$params') removed: registry.khronos.org rewrites it on every request,
 # so the raw bytes are not reproducible. See pin_hash() in fetch-oracles.sh.
+01ef399ed4932fd8bbd95c0e2e01f7d6bd0d20748c0ca2c9b2f196f9443581ca  8080-exercisers/8080-8085-cpu-exerciser-results.pdf
 6e3286e11bb1a8f47b8ee1280b4a067be813193363e3223c99b0d21912f44aeb  8080-exercisers/8080EXM.COM
 806d3a069b0021e9925c0b7c26fd74a3c397ca7f618a599ab4a8396ebcd1f3f3  8080-exercisers/8080EXM.MAC
 18eb3c79cba42c0718f160be6a1853cb64cdce7aa47d65780189a57bdd98c4e0  8080-exercisers/8080PRE.COM

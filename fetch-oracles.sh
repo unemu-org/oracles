@@ -391,6 +391,10 @@ intel/i8080-alpm.pdf ${I8080ALPM_URL} 5000000
 8080-exercisers/8080PRE.MAC ${CPU8080_TESTS_URL}/8080PRE.MAC 4000
 8080-exercisers/8080EXM.COM ${CPU8080_TESTS_URL}/8080EXM.COM 4000
 8080-exercisers/8080EXM.MAC ${CPU8080_TESTS_URL}/8080EXM.MAC 20000
+# The exerciser author's results page (a 2019 browser print of the web.archive.org snapshot
+# 20151108135453 of his 8080/8085 CPU Exerciser page, 4 pp): the per-chip table of measured
+# CRCs from which 8080EXM's expected values come, with contributor notes. No licence: cite-only.
+8080-exercisers/8080-8085-cpu-exerciser-results.pdf ${CPU8080_TESTS_URL}/8080_8085%20CPU%20Exerciser.pdf 100000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.

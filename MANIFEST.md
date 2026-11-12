@@ -324,6 +324,7 @@ manuals below are what settles the disagreement.
 | `8080-exercisers/8080PRE.COM` | 8080 preliminary test (CP/M .COM, loads at 0100h) | 1024 | `18eb3c79cba42c0718f160be6a1853cb64cdce7aa47d65780189a57bdd98c4e0` | GPL-2.0-or-later | Sanity pass before the exerciser: data moves, PUSH/POP incl. PSW, CPI, ANI, INR/DCR/INX, RRC, jumps, calls and returns on every condition. Prints "8080 Preliminary tests complete" |
 | `8080-exercisers/8080PRE.MAC` | its assembly source | 4818 | `ca1507444929978038ad4f83d18e13bcce72072df2b850932b3982c31cfc1ccc` | GPL-2.0-or-later | The source of the above |
 | `8080-exercisers/8080EXM.COM` | 8080 instruction exerciser with expected CRCs (CP/M .COM, loads at 0100h) | 4608 | `6e3286e11bb1a8f47b8ee1280b4a067be813193363e3223c99b0d21912f44aeb` | GPL-2.0-or-later | 25 CRC groups over ALU, DAA/CMA/STC/CMC, INR/DCR, INX/DCX, DAD, loads and stores, MOV/MVI and rotates, comparing all eight PSW bits; prints "PASS! crc is:" or "ERROR **** crc expected: ... found:" per group. No IN, OUT, RST or HLT |
+| `8080-exercisers/8080-8085-cpu-exerciser-results.pdf` | The exerciser author's results page: a 2019 browser print of the web.archive.org snapshot 20151108135453 of his "8080/8085 CPU Exerciser" page (4 pp) | 156067 | `01ef399ed4932fd8bbd95c0e2e01f7d6bd0d20748c0ca2c9b2f196f9443581ca` | none stated (cite-only) | p. 3 "Results": the per-chip CRC table for the 8080 exerciser groups, with the parts and contributors (pp. 3-4). The expected CRCs of 8080EXM come from its main column; the AMD 9080A and 8080A rows differ on the two ALUOP groups, with a contributor note on ANA/ANI flags. Personal contact details in the print are not to be copied |
 | `8080-exercisers/8080EXM.MAC` | its assembly source | 29411 | `806d3a069b0021e9925c0b7c26fd74a3c397ca7f618a599ab4a8396ebcd1f3f3` | GPL-2.0-or-later | The source of the above, with the expected CRC per group |
 
 - Source: `https://altairclone.com/downloads/cpu_tests/` (the 2013 maintainer's download area).
@@ -338,9 +339,10 @@ manuals below are what settles the disagreement.
   `CALL 0005h` and exit with `JMP 0000h`. 8080EXM sets SP from the word at `0006h`
   (`LHLD 6; SPHL`); 8080PRE never sets SP before its first `CALL`, so the host must start it
   with a usable SP. No harness exists yet (x80 bead x80-ecy.17).
-- An oracle can falsify an x80 reading, never license one (x80 `PROVENANCE.md` §2). Which
-  parts the expected CRCs were measured on is not established by the pinned files; x80
-  records the provenance of any CRC it relies on before treating a mismatch as a defect.
+- An oracle can falsify an x80 reading, never license one (x80 `PROVENANCE.md` §2). The
+  results PDF records which parts the expected CRCs were reported for (contributor reports on
+  the author's page, not Intel documentation); x80 cites it before treating a mismatch as a
+  defect.
 
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 
