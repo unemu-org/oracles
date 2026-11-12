@@ -80,6 +80,10 @@ I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM
 I286PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80286/${I286PRM_ORDER}_80286_and_80287_Programmers_Reference_Manual_1987.pdf"
 I8080UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/${I8080UM_ORDER}_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf"
 I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf"
+# 8085 sources for x80 (M3); same mirror rule as the 8080 manuals.
+I8085UM_ORDER="205775-002"   # MCS-80/85 Family User's Manual (January 1983)
+I8085UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/MCS80_85_Users_Manual_Jan83.pdf"
+IECH1988_URL="http://bitsavers.trailing-edge.com/components/intel/_dataBooks/1988_Intel_Embedded_Controller_Handbook_Volume_I_8-Bit.pdf"
 # 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
 CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
@@ -381,6 +385,17 @@ intel/i8080-um.pdf ${I8080UM_URL} 20000000
 # WITNESS: per-opcode cycles and states, interrupts, flag notes. 7.15 MB, hence the smaller
 # minimum size.
 intel/i8080-alpm.pdf ${I8080ALPM_URL} 5000000
+# --- 8085 CPU sources (x80, M3) — © Intel, no redistribution licence. Cite-only, kept local.
+# MCS-80/85 Family User's Manual (${I8085UM_ORDER}, January 1983, 210 pp, a scan with an OCR
+# text layer) — x80's PRIMARY for the 8085A: functional description (interrupts TRAP and
+# RST 5.5/6.5/7.5, RIM/SIM, SID/SOD, machine cycles, reset/halt/hold), the instruction set
+# with 8085A and 8080A states side by side, and abridged data sheets.
+intel/i8085-um.pdf ${I8085UM_URL} 5000000
+# 1988 Intel Embedded Controller Handbook, Volume I, 8-bit (1024 pp) — pinned for ONE
+# document inside it: the 8085AH/8085AH-2/8085AH-1 data sheet, order number 231718-001
+# (September 1987), printed pp. 16-11 to 16-30 (PDF pages 958 to 977). Second source for the
+# 8085 (pins, interrupt table, machine-cycle chart, instruction summary; no per-instruction states).
+intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
 # --- 8080 CPU exercisers (x80 oracles) — GPL-2.0-or-later: Frank D. Cringle's Z80
 # instruction exerciser and preliminary test (1994), modified for the 8080 by Ian Bartholomew
 # (the exerciser in February 2009); Mike Douglas (May 2013) added to the exerciser the success

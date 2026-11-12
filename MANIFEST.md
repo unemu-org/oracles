@@ -12,8 +12,8 @@ Three projects draw on this stash, and their sources are grouped separately:
   Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
   its MOO container format. See **x86 sources** below.
 - **x80** (Intel 8080-family interpreter) — the Intel 8080 user's manual and the 8080/8085
-  assembly-language manual, and two 8080 CPU exercisers as oracles. See **8080 CPU manuals**
-  and **8080 CPU exercisers** below.
+  assembly-language manual, the 8085 sources, and two 8080 CPU exercisers as oracles. See
+  **8080 CPU manuals**, **8085 CPU sources** and **8080 CPU exercisers** below.
 
 The pins are deliberately independent: `KERNEL_REF` (GPU headers) and `KERNEL_X86_REF`
 (syscall tables) are separate variables even while they hold the same tag, so bumping one
@@ -316,6 +316,19 @@ manuals below are what settles the disagreement.
   logical AND instructions (user's manual p. 4-9 versus assembly-language manual p. 1-12).
   x80 records and settles such disagreements in its own `PROVENANCE.md`; this stash only
   pins the sources.
+
+## 8085 CPU sources (x80, M3: instruction semantics, flags, timing, interrupts) — **FETCH-ONLY**
+
+| File | Title | Pages | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `intel/i8085-um.pdf` | Intel MCS-80/85 Family User's Manual (Order Number 205775-002, January 1983) | 210 | `5d08f75c75605fbda22afb5071c6a6a93f3e797aa7aa980fa658098ab0651325` | © Intel (cite-only) | **x80's primary source for the 8085A.** Ch. 2 the 8085A functional description: flags, interrupts TRAP and RST 5.5/6.5/7.5 and INTR/INTA with masks and priority, RIM/SIM, SID/SOD, machine-cycle status, timing, HALT/HOLD, reset; Ch. 4 the 8080; Ch. 5 the instruction set with per-instruction cycles, states and flags, Table 5-1 giving 8085A and 8080A states side by side; Ch. 6 abridged data sheets. A scan with an OCR text layer: check a cited value against the page image |
+| `intel/intel-embedded-controller-handbook-1988-v1.pdf` | Intel Embedded Controller Handbook, Volume I, 8-bit (1988) | 1024 | `796ba5e7273bd4bfbe745b771062e4be8666037af0cc1742a69d61c1476941fb` | © Intel (cite-only) | Pinned for **one** document: the 8085AH/8085AH-2/8085AH-1 data sheet, Order Number 231718-001, September 1987, printed pp. 16-11 to 16-30 (PDF pages 958 to 977): x80's second source for the 8085 (pins, interrupt priority and restart table, machine-cycle chart, bus states, timing, and an instruction summary whose "New 8085AH instructions" are RIM and SIM; no per-instruction states) |
+
+- Sources: `http://bitsavers.trailing-edge.com/components/intel/MCS80/MCS80_85_Users_Manual_Jan83.pdf`
+  and `http://bitsavers.trailing-edge.com/components/intel/_dataBooks/1988_Intel_Embedded_Controller_Handbook_Volume_I_8-Bit.pdf`,
+  mirrors of bitsavers.org; byte identity with bitsavers.org itself is not verified.
+- The 8080/8085 assembly-language manual (`intel/i8080-alpm.pdf`, 9800301-04) is the second
+  witness for 8085 per-instruction states, since the data sheet gives none.
 
 ## 8080 CPU exercisers (x80 oracles: falsify, never define) — **FETCH-ONLY**
 
