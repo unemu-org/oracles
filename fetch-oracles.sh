@@ -411,6 +411,10 @@ intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
 8080-exercisers/8080PRE.MAC ${CPU8080_TESTS_URL}/8080PRE.MAC 4000
 8080-exercisers/8080EXM.COM ${CPU8080_TESTS_URL}/8080EXM.COM 4000
 8080-exercisers/8080EXM.MAC ${CPU8080_TESTS_URL}/8080EXM.MAC 20000
+# The 8085 build of the same exerciser (x80, M3): modified for the 8085 by Ian Bartholomew
+# (October 2009), flag mask D5h; success CRCs added in May 2020 per its header. GPL-2.0-or-later.
+8080-exercisers/8085EXM.COM ${CPU8080_TESTS_URL}/8085EXM.COM 4000
+8080-exercisers/8085EXM.MAC ${CPU8080_TESTS_URL}/8085EXM.MAC 20000
 # The exerciser author's results page (a 2019 browser print of the web.archive.org snapshot
 # 20151108135453 of his 8080/8085 CPU Exerciser page, 4 pp): the per-chip table of measured
 # CRCs from which 8080EXM's expected values come, with contributor notes. No licence: cite-only.
