@@ -80,6 +80,8 @@ I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM
 I286PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80286/${I286PRM_ORDER}_80286_and_80287_Programmers_Reference_Manual_1987.pdf"
 I8080UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/${I8080UM_ORDER}_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf"
 I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf"
+# 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
+CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -379,6 +381,16 @@ intel/i8080-um.pdf ${I8080UM_URL} 20000000
 # WITNESS: per-opcode cycles and states, interrupts, flag notes. 7.15 MB, hence the smaller
 # minimum size.
 intel/i8080-alpm.pdf ${I8080ALPM_URL} 5000000
+# --- 8080 CPU exercisers (x80 oracles) — GPL-2.0-or-later: Frank D. Cringle's Z80
+# instruction exerciser and preliminary test (1994), modified for the 8080 by Ian Bartholomew
+# (the exerciser in February 2009); Mike Douglas (May 2013) added to the exerciser the success
+# CRCs shown on Bartholomew's website and the PASS display. FETCH-ONLY by the x80 maintainer's
+# decision: run locally as falsifying oracles, never committed here. The .MAC files are the
+# assembly sources of the .COM programs (CP/M, load address 0100h).
+8080-exercisers/8080PRE.COM ${CPU8080_TESTS_URL}/8080PRE.COM 1000
+8080-exercisers/8080PRE.MAC ${CPU8080_TESTS_URL}/8080PRE.MAC 4000
+8080-exercisers/8080EXM.COM ${CPU8080_TESTS_URL}/8080EXM.COM 4000
+8080-exercisers/8080EXM.MAC ${CPU8080_TESTS_URL}/8080EXM.MAC 20000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.

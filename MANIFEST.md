@@ -12,7 +12,8 @@ Three projects draw on this stash, and their sources are grouped separately:
   Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
   its MOO container format. See **x86 sources** below.
 - **x80** (Intel 8080-family interpreter) — the Intel 8080 user's manual and the 8080/8085
-  assembly-language manual. See **8080 CPU manuals** below.
+  assembly-language manual, and two 8080 CPU exercisers as oracles. See **8080 CPU manuals**
+  and **8080 CPU exercisers** below.
 
 The pins are deliberately independent: `KERNEL_REF` (GPU headers) and `KERNEL_X86_REF`
 (syscall tables) are separate variables even while they hold the same tag, so bumping one
@@ -315,6 +316,31 @@ manuals below are what settles the disagreement.
   logical AND instructions (user's manual p. 4-9 versus assembly-language manual p. 1-12).
   x80 records and settles such disagreements in its own `PROVENANCE.md`; this stash only
   pins the sources.
+
+## 8080 CPU exercisers (x80 oracles: falsify, never define) — **FETCH-ONLY**
+
+| File | Program | Bytes | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `8080-exercisers/8080PRE.COM` | 8080 preliminary test (CP/M .COM, loads at 0100h) | 1024 | `18eb3c79cba42c0718f160be6a1853cb64cdce7aa47d65780189a57bdd98c4e0` | GPL-2.0-or-later | Sanity pass before the exerciser: data moves, PUSH/POP incl. PSW, CPI, ANI, INR/DCR/INX, RRC, jumps, calls and returns on every condition. Prints "8080 Preliminary tests complete" |
+| `8080-exercisers/8080PRE.MAC` | its assembly source | 4818 | `ca1507444929978038ad4f83d18e13bcce72072df2b850932b3982c31cfc1ccc` | GPL-2.0-or-later | The source of the above |
+| `8080-exercisers/8080EXM.COM` | 8080 instruction exerciser with expected CRCs (CP/M .COM, loads at 0100h) | 4608 | `6e3286e11bb1a8f47b8ee1280b4a067be813193363e3223c99b0d21912f44aeb` | GPL-2.0-or-later | 25 CRC groups over ALU, DAA/CMA/STC/CMC, INR/DCR, INX/DCX, DAD, loads and stores, MOV/MVI and rotates, comparing all eight PSW bits; prints "PASS! crc is:" or "ERROR **** crc expected: ... found:" per group. No IN, OUT, RST or HLT |
+| `8080-exercisers/8080EXM.MAC` | its assembly source | 29411 | `806d3a069b0021e9925c0b7c26fd74a3c397ca7f618a599ab4a8396ebcd1f3f3` | GPL-2.0-or-later | The source of the above, with the expected CRC per group |
+
+- Source: `https://altairclone.com/downloads/cpu_tests/` (the 2013 maintainer's download area).
+- Lineage, from the `.MAC` headers: Frank D. Cringle's Z80 instruction exerciser and
+  preliminary test (© 1994, GPL-2.0-or-later), modified for the 8080 by Ian Bartholomew (the
+  exerciser dated February 2009; the preliminary test undated). Mike Douglas (May 2013) added
+  to the exerciser the success CRCs shown on Bartholomew's 8080/8085 CPU Exerciser website and
+  the PASS display. The licence notice is in each `.MAC` header.
+- Fetch-only by the x80 maintainer's decision: run locally, never committed here, so no GPL
+  material enters this repository or x80's MIT OR Apache-2.0 code.
+- Host services: both programs load at 0100h, print through CP/M BDOS functions 2 and 9 via
+  `CALL 0005h` and exit with `JMP 0000h`. 8080EXM sets SP from the word at `0006h`
+  (`LHLD 6; SPHL`); 8080PRE never sets SP before its first `CALL`, so the host must start it
+  with a usable SP. No harness exists yet (x80 bead x80-ecy.17).
+- An oracle can falsify an x80 reading, never license one (x80 `PROVENANCE.md` §2). Which
+  parts the expected CRCs were measured on is not established by the pinned files; x80
+  records the provenance of any CRC it relies on before treating a mismatch as a defect.
 
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 
