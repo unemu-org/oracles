@@ -89,6 +89,13 @@ I8085UM_ORDER="205775-002"   # MCS-80/85 Family User's Manual (January 1983)
 I8085UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/MCS80_85_Users_Manual_Jan83.pdf"
 IECH1988_URL="http://bitsavers.trailing-edge.com/components/intel/_dataBooks/1988_Intel_Embedded_Controller_Handbook_Volume_I_8-Bit.pdf"
 NECV20UM_URL="http://bitsavers.trailing-edge.com/components/nec/V-Series/V20_V30_Users_Manual_Oct86.pdf"
+# Z80 sources for x80 (M4): the vendor's UM008011-0816 file at a fixed Wayback capture;
+# four historical scans from the same bitsavers mirror as the Intel and NEC manuals.
+Z80UM_URL="https://web.archive.org/web/20231217134046id_/https://www.zilog.com/docs/z80/um0080.pdf"
+Z80TM1977_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/03-0029-01_Z80_CPU_Technical_Manual_1977.pdf"
+Z80ALPM1978_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/Z80_Assembly_Language_Programming_Manual_197801.pdf"
+Z80PS1978_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/03-0027-02_Z80_CPU_Product_Specification_Mar78.pdf"
+MK78515_URL="http://bitsavers.trailing-edge.com/components/mostek/Z80/MK78515_Mostek_Z80_Programming_Manual_V2.0_Oct1978.pdf"
 # 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
 CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
@@ -426,6 +433,27 @@ intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
 # V-series instruction-set extensions, interrupts and reset. 10.8 MB, hence the smaller
 # minimum size.
 nec/v20-v30-um.pdf ${NECV20UM_URL} 5000000
+
+# --- Z80 CPU sources (x80, M4) — © Zilog / Mostek, no redistribution licence.
+# Cite-only, kept local. Documented behaviour only; the historical witnesses share
+# Zilog's lineage and can catch retyping errors, not independently establish the design.
+# Z80 CPU User Manual (UM008011-0816, revision 11, August 2016, 332 pp) — PRIMARY:
+# architecture, pins, timing, interrupt response, op-code tables and instruction entries.
+# Vendor file archived on 2023-12-17; the live URL now redirects to a landing page.
+# 1,587,333 bytes, hence the smaller minimum size.
+zilog/z80-um.pdf ${Z80UM_URL} 1000000
+# Z80-CPU / Z80A-CPU Technical Manual (03-0029-01, ©1977, 83 pp) — second witness:
+# pin description, CPU timing, interrupt response, flags, op codes and execution times.
+zilog/z80-tm-1977.pdf ${Z80TM1977_URL} 4000000
+# Z80-Assembly Language Programming Manual (03-0002-01 on the back cover,
+# January 1978 printing, 315 pp) — second witness: instruction entries, flags and states.
+zilog/z80-alpm-1978.pdf ${Z80ALPM1978_URL} 4000000
+# Z80-CPU / Z80A-CPU Product Specification (03-0027-02, March 1978, 10 pp) —
+# second witness: instruction summary and timing tables. 1,431,709 bytes.
+zilog/z80-ps-1978.pdf ${Z80PS1978_URL} 1000000
+# Mostek Z80 Programming Manual (MK78515, V2.0, October 1978, 312 pp) —
+# second witness: instruction entries with flags and states, interrupt and opcode tables.
+mostek/mk78515-z80-pm.pdf ${MK78515_URL} 7000000
 
 # --- System V ABI, AMD64 Architecture Processor Supplement ("the x86-64 psABI"), LaTeX
 # sources @ ${PSABI_COMMIT}.

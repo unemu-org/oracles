@@ -374,6 +374,56 @@ manuals below are what settles the disagreement.
   mode switch and the MD flag; the 8080 instruction semantics are x80's, cited from the
   **8080 CPU manuals** above.
 
+## Z80 CPU sources (x80, M4: instruction semantics, flags, timing, interrupts) — **FETCH-ONLY**
+
+| File | Title | Pages | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `zilog/z80-um.pdf` | Z80 CPU User Manual (UM008011-0816, revision 11, August 2016) | 332 | `e3c83da5a5d8e372364c20fa53665e6fbb165ec6ac38c8c1eebc359603447b5e` | ©2016 Zilog (cite-only; no redistribution grant) | **Primary for documented Z80 behaviour:** architecture, pin functions, timing, interrupt response, op-code tables, instruction entries with flags and states |
+| `zilog/z80-tm-1977.pdf` | Z80-CPU / Z80A-CPU Technical Manual (03-0029-01, ©1977; no separate printing date found) | 83 | `9c7304b4842dac6d34c9cd1552f006c2f1b6fa9373f7e6d1b614956d91efc485` | ©1977 Zilog (cite-only; no redistribution grant) | **Second witness:** §3 pin description, §4 CPU timing, §6 flags, §7 op codes and execution times, §8 interrupt response, §12 instruction summary |
+| `zilog/z80-alpm-1978.pdf` | Z80-Assembly Language Programming Manual (03-0002-01, January 1978 printing; colophon also marks “3.0 D.S.” and “REL. 2.1”) | 315 | `d9d18bd2bc074d61faf6b46f985122e940925b04d37fa6480372b5c3794faa6c` | ©1977 Zilog (cite-only; no redistribution grant) | **Second witness:** §VI instruction entries with encodings, flags, machine cycles and T-states |
+| `zilog/z80-ps-1978.pdf` | Z80-CPU / Z80A-CPU Product Specification (03-0027-02, March 1978) | 10 | `98ef3a633edf3b1c9350c2b123e12608133b83c0ffb40233e0a2771f5293aee9` | ©1977 Zilog (cite-only; no redistribution grant) | **Second witness:** instruction summary (pp. 4–5), timing diagrams and characteristic tables |
+| `mostek/mk78515-z80-pm.pdf` | Z80 Programming Manual (MK78515, V2.0, printed October 1978) | 312 | `1f5217c39e03aa2a55a087305649e2079f8b3d94a512a2e4d415d15b7dba43fd` | ©1978 Mostek (cite-only; no redistribution grant) | **Second witness:** §2 instruction entries with flags and states, Table 2-1 interrupt enable/disable, Appendix A opcode listing |
+
+- Source (user manual): `https://web.archive.org/web/20231217134046id_/https://www.zilog.com/docs/z80/um0080.pdf`.
+  MEASURED by the supervisor, 2026-11-13: the live vendor URL
+  `https://www.zilog.com/docs/z80/um0080.pdf` answers 301 to a vendor landing page, not
+  the PDF. The Wayback CDX index shows at least two different PDF digests at that URL
+  over 2020–2023. The fixed capture `20231217134046` is the vendor's own file archived
+  at the vendor URL, pinned here by hash (1,587,333 bytes). Local metadata identifies
+  “Z80 CPU User Manual”, created 2016-08-31 with Acrobat Distiller 9.0.0; PDF page 1
+  reads UM008011-0816 and ©2016 Zilog. The live URL alone does not identify an edition.
+- Sources (historical scans), from the bitsavers mirror used for the Intel and NEC pins:
+  `http://bitsavers.trailing-edge.com/components/zilog/z80/03-0029-01_Z80_CPU_Technical_Manual_1977.pdf`,
+  `http://bitsavers.trailing-edge.com/components/zilog/z80/Z80_Assembly_Language_Programming_Manual_197801.pdf`,
+  `http://bitsavers.trailing-edge.com/components/zilog/z80/03-0027-02_Z80_CPU_Product_Specification_Mar78.pdf`,
+  `http://bitsavers.trailing-edge.com/components/mostek/Z80/MK78515_Mostek_Z80_Programming_Manual_V2.0_Oct1978.pdf`.
+  Byte identity with bitsavers.org itself was not checked in this local-only pinning pass.
+- READ from page images rendered at 150 dpi, 2026-11-13: user manual title/copyright
+  PDF 1–2 and revision history iii/PDF 3; Technical Manual cover/colophon PDF 1–2;
+  assembly manual cover/colophon/contents PDF 1–3 and document number on back cover
+  PDF 315; Product Specification title/date PDF 1 and number/copyright PDF 10;
+  Mostek cover/title PDF 1, 3 and printing/copyright PDF 312. Page counts include covers
+  and blank scan pages. UM revision 11 changes formatting on pp. 39–41; revisions
+  10/09/08 record typos and errors corrected in 2016 (10 also adds the notation summary).
+  Earlier listed corrections cover POP qq (2015), the flag table and EXX (2014), RLCA
+  (2005), and IM 0/1/2 bit patterns (2004); revision 11 is not a claim of error-free text.
+- Page maps (PDF pages are one-based): UM008011-0816 printed n = PDF n+14 for
+  architecture, pins, timing, interrupt response, op-code tables and instruction entries;
+  03-0029-01 printed n = PDF n+6 for §§3, 4, 7, 8 and 12; 03-0027-02 printed n = PDF n
+  (instruction summary pp. 4–5, characteristic tables pp. 6–9). Mostek printed 2-n =
+  PDF 14+n, including Table 2-1 at 2-15/PDF 29 and instruction entries 2-21–2-258;
+  Appendix A listing page n = PDF 274+n (1–15). Its unnumbered reference tables
+  D-1/D-2 are PDF 309 and D-3/D-4/D-5 are PDF 310.
+- The assembly manual has inserted unnumbered pages: printed 24–25 = PDF n+3;
+  26–98 = n+4; 99–145 = n+5; 146–162 = n+6; 163–201 = n+7;
+  202–218 = n+8; 219–251 = n+9; 252–274 = n+10. These rules cover §VI and its
+  instruction entries, checked on two images per range. Do not apply one global offset.
+- All four second witnesses share Zilog's documentation lineage, including Mostek's
+  restatement. They can catch retyping errors, not independently establish the design or
+  exclude a shared design error. They are not hardware measurements. M4 covers documented
+  behaviour only; x80 records source disagreements and their resolution in its own
+  `PROVENANCE.md`.
+
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 
 System V ABI, AMD64 Architecture Processor Supplement, LaTeX sources from
