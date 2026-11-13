@@ -426,13 +426,16 @@ evidence and its silicon scope, not an instruction or flag ruling for a consumer
 | `z80-exercisers/prelim.z80` | Assembly source of prelim.com | 5384 | `afefdd15c42ea8d0c123ad099108962ca5ad26b3ffd043d2ba578c2b01cab1fd` | GPL-2.0-or-later | Copyright and GPL-2.0-or-later notice; host and test sequence |
 | `z80-exercisers/zexdoc.com` | ZEXDOC instruction exerciser (CP/M, load 0100h) | 8704 | `34923a7ed82285d3038b2d54bd64899e12173eebb61f9d07b4fc72e78af2ae8f` | GPL-2.0-or-later | 67 groups: 58 eligible for judgment, 9 not run because their vectors include undocumented encodings; documented flag masks exclude bits 5 and 3 |
 | `z80-exercisers/zexdoc.z80` | Assembly source of zexdoc.com | 40283 | `4f7b83d5ed1b4ce34f1b6f19b996e40588e3698db9aa2e31bece377db5b91d99` | GPL-2.0-or-later | Descriptors, increment/shift vectors and expected CRCs; complete descriptor data and table order match the pinned binary |
+| `z80-exercisers/zexall.com` | ZEXALL instruction exerciser (CP/M, load 0100h), Frank D. Cringle, ©1994 | 8704 | `6e2da55147a04f28d303d5da6a1e6b771557ac244653590a0f24a2d39c8537e8` | GPL-2.0-or-later | All-flag exerciser, including bits 5/3 and undocumented encodings; unnamed-real-Z80 CRCs are falsifiers only |
+| `z80-exercisers/zexall.z80` | Assembly source of zexall.com | 40283 | `495f686b3f4418d50a110ba6ae4c6d86d715506e1eb6117040bd6f1eb4e011c5` | GPL-2.0-or-later | Header, descriptors, masks, vectors and expected CRCs; same origin as ZEXDOC, not independent silicon confirmation |
+| `z80-exercisers/z80test-1.2a.zip` | Zilog Z80 CPU test suite — Patrik Rak, v1.2a, 2 December 2023 (`changes.txt`) | 61595 | `7df0443d703e6b3114ea04b4cdef3e13b91421c62e37185c1036d06864cacbaf` | MIT (`license.txt`, ©2012–2023 Patrik Rak); fetch-only by scope choice | Seven Spectrum TAP variants plus source; identified-hardware CRCs may confirm only facts their vectors discriminate (decision-17) |
 | `z80-exercisers/COPYING` | GNU General Public License, version 2 | 17990 | `1ca3e8f71b7de618968e7ea9fe47822d9e704dc476aef8544033abedec355225` | GPL-2.0 text | Licence text referenced by both source headers; their notices permit version 2 or later |
 
 - Source: [begoon/yaze](https://github.com/begoon/yaze/tree/993d8647eabf95c61e49b134198a240ab577358b),
   pinned at `993d8647eabf95c61e49b134198a240ab577358b`.
   Raw base: `https://raw.githubusercontent.com/begoon/yaze/993d8647eabf95c61e49b134198a240ab577358b/`;
   upstream paths are `test/prelim.com`, `test/prelim.z80`, `test/zexdoc.com`,
-  `test/zexdoc.z80`, and `COPYING`.
+  `test/zexdoc.z80`, `test/zexall.com`, `test/zexall.z80`, and `COPYING`.
 - Lineage: Frank D. Cringle's preliminary test and instruction exerciser, © 1994,
   distributed with original yaze 1.14. The repository README describes an unchanged
   import; the import commit is `4424f29` (“Imported the original version 1.14”,
@@ -466,8 +469,59 @@ evidence and its silicon scope, not an instruction or flag ruling for a consumer
   and offsets are in x80's `PROVENANCE.md` §2; no Z80 harness is added here.
 - An oracle can falsify a reading, never license a behavior (x80 `PROVENANCE.md` §2).
   Eligibility for judgment is an encoding audit, not a measured PASS result.
-  ZEXALL is not used because it compares flag bits 5 and 3; no ZEXALL artifact is
-  fetched. Patrik Rak's z80test is an evaluated candidate only, with no fetch pin.
+  ZEXALL and z80test are now pinned for later undocumented-behaviour work. Pinning
+  does not change the M4 audit or admit either program to the existing host.
+
+ZEXALL details (READ locally, 2026-11-13): `zexall.z80` lines 34–39 attribute
+the expected CRCs to an empirical run on a real Z80, with no maker, marking,
+revision or per-group capture. This is **B, reported hardware measurement
+(Z80; exact part and measurer unverified)**, eligible only to falsify under
+decision-17. Its header is GPL-2.0-or-later and `COPYING` above supplies GPL v2.
+Its `start`, `done` and `bdos` labels require writable code at 0100h, a safe
+stack address in word 0006h, CALL 0005h functions 2 (E character) and 9
+('$'-terminated DE string), and JP 0000h for exit. Tests use DI/EI but need no
+injected interrupts or port device. A new digest/encoding audit and host are
+still required before running it; the ZEXDOC binary/source audit is not one for ZEXALL.
+
+z80test pin URL:
+`https://github.com/raxoft/z80test/releases/download/v1.2a/z80test-1.2a.zip`.
+`readme.txt` states that the results are compared with “values obtained from a
+real 48K Spectrum with Zilog Z80 CPU”. This is **B; hardware-measured (Zilog
+Z80 in a 48K Spectrum, by Patrik Rak)**; no package marking, NMOS/CMOS revision,
+date code or raw capture is identified. `changes.txt` dates v1.2a and records
+corrected interrupted INIR/INDR MEMPTR CRCs. The archive's `license.txt` is MIT.
+Neither oracle has been executed as part of this source audit.
+
+- Variants (`readme.txt`, `src/z80*.asm`): `z80full` checks registers and all
+  flags; `z80doc` masks flags to documented bits; `z80flags`/`z80docflags`
+  ignore registers; `z80ccf` samples flags after an appended CCF;
+  `z80memptr` samples after BIT n,(HL); `z80ccfscr` draws a continuously
+  refreshed CCF screen, without a CRC result or normal exit.
+- Coverage (`src/tests.asm`, `testtable` and named descriptors): index halves,
+  SLL (named SLIA), indexed CB copies/aliases, per-instruction flags, ED aliases,
+  IN (C) / ED 70, OUT (C),0 / ED 71, SCF/CCF variants and self-overwriting
+  LDxR/INxR tests that expose repeat-step state. This is not exhaustive proof
+  of ED holes, ignored-prefix sequences or interrupt-injection behaviour.
+  The OUT tests CRC CPU/memory state, not captured port output, so ED 71's
+  emitted byte cannot be confirmed from their CRC alone.
+- Limits (`readme.txt`): CCF CRCs assume the genuine Zilog variant and differ
+  on other makers; board-dependent/random CCF behaviour is discussed. The
+  vectors were not designed to stress MEMPTR and may miss many cases. NEC/ST
+  test variants do not identify additional hardware used for expected CRCs.
+- Host (`src/loader.bas`, `Makefile`, `main.asm`, `print.asm`, `idea.asm`):
+  Spectrum-style, **not CALL 5**. BASIC does CLEAR 32767, LOAD CODE, RANDOMIZE
+  USR 32768; TAP code loads/enters at **8000h**. Supply writable RAM, a usable
+  caller stack and Spectrum system variables/ROM services: CHAN-OPEN **1601h**
+  with A=2 and RST **10h** character printing (IY set to **5C3Ah**). Printing
+  enables then disables interrupts; ordinary tests run with DI. Normal suite
+  exit restores saved HL'/IY, executes EI and RET to BASIC/caller; completion
+  is `Result: all tests passed.` (otherwise a failure count). The screen
+  variant writes Spectrum screen/attribute RAM and loops forever.
+- I/O (`main.asm` `.incheck`, `idea.asm`, `tests.asm`): OUT (FEh),07h sets MIC
+  low and input groups require IN (FEh)=BFh; a mismatch reports failure and
+  avoids the affected test. A host must reproduce the tested Spectrum port
+  behaviour, not substitute arbitrary reads. Preserve linked addresses:
+  `idea.asm` warns that moving the data area from 8800h changes CRCs.
 
 ## NEC V20/V30 manual (V-series models, 8080 emulation mode) — **FETCH-ONLY**
 
@@ -532,6 +586,153 @@ evidence and its silicon scope, not an instruction or flag ruling for a consumer
   exclude a shared design error. They are not hardware measurements. M4 covers documented
   behaviour only; x80 records source disagreements and their resolution in its own
   `PROVENANCE.md`.
+
+## Z80 undocumented-behaviour sources (x80, M6) — **FETCH-ONLY**
+
+READ locally, 2026-11-13: Young's title, copyright, history, relevant opcode/flag
+sections and tables on PDF page images; the MEMPTR text; Banks' measurement
+write-ups and result-page Markdown. These pins record statements and their
+origins under x80 decision-17, as amended by x80 decision-18; they admit no behaviour.
+All fetched bytes remain local, including the freely licensed PDF. No decoder,
+emulator, HDL or netlist simulator implementation is a source here.
+
+| File | Title / author / revision | Pages / bytes | sha256 | Licence; class and label |
+|---|---|---|---|---|
+| `zilog/z80-undocumented/young-undocumented-z80-documented-v0.91.pdf` | The Undocumented Z80 Documented — Sean Young; maintained by Jan (named in §§1.1/1.4; surname not in the document); v0.91, 18 September 2005 | 52 / 276007 | `6413048f39c2e735373b1fb23102599133bc64ccd0ed63b16fbc1173643d7a9d` | GFDL 1.1-or-later, no invariant sections or cover texts (copyright page/PDF 2); **C; third-party analysis**, tested Z80 specimens not identified |
+| `zilog/z80-undocumented/memptr-boo-boo-2006.txt` | MEMPTR, esoteric register of the ZiLOG Z80 CPU — Boo-boo; draft English translation Vladimir Kladov; ©2006 zx.pk.ru | text / 5017 | `78d19f0809c31dfb516150ad5e7ba747063f40bbb528439f1316539c7f0c612a` | No redistribution grant in text; **C; third-party analysis**, reports experiments but ordinary Z80 specimens unidentified; explicitly names KP1858BM1/T34BM1 exceptions |
+| `zilog/z80-undocumented/z80decoder-wiki/*.md` | Z80Decoder wiki — David Banks (hoglet67); supplied git revision `49e542dd40c36ef7367cb5806292764416dc987a`, inspected 2026-11-13 | 22 Markdown files; individual pins below | per-page below and in SHA256SUMS.fetched | No licence grant in supplied Markdown; cite-only. Measurement sections **B; hardware-measured (listed Z80 parts, by David Banks)**; acquisition/index pages are context, simulator discussion is excluded from evidence |
+
+URLs and retrieval:
+
+- Young: `https://web.archive.org/web/20260108105255id_/http://www.myquest.nl/z80undocumented/z80-documented-v0.91.pdf`
+  (fixed 2026-01-08 10:52:55 UTC capture). Title is PDF 1; copyright p. i is
+  PDF 2; contents pp. ii–iii are PDF 3–4; printed Arabic 5–52 = PDF 5–52.
+  The title, date and grant were checked on images, not inferred from a filename.
+- MEMPTR: `https://gist.githubusercontent.com/drhelius/8497817/raw/0157588ecd91bb82eec06d85d5be0ca2a3472c30/Z80%20MEMPTR`.
+  This is a **2014 third-party gist copy** of the 2006 Boo-boo/Kladov analysis,
+  not a capture from its authors. The supplied retrieval record names gist
+  revision `cdd2889d`; the raw URL above carries its own immutable identifier.
+  Original host `https://www.cpcwiki.eu/imgs/2/2f/Memptr_eng.txt` refused automated
+  clients according to that record. No original-host comparison was possible
+  in this offline audit; the hash pins exactly the supplied copy.
+- Banks: `https://github.com/hoglet67/Z80Decoder.wiki.git` at
+  `49e542dd40c36ef7367cb5806292764416dc987a`. **Git-pinned tree mechanism**:
+  `fetch_z80decoder_wiki` clones the wiki only into ignored `.upstream/`, fetches
+  that commit, then exports the explicit 22-page inventory using `git show`
+  into `zilog/z80-undocumented/z80decoder-wiki/`. SHA-256 pins the exported blobs;
+  `write_sums` includes them and offline `verify` checks present files. No raw
+  wiki endpoint is assumed to serve commit URLs. No network or git writes were
+  performed in this audit; association with the supplied commit is the
+  supervisor's retrieval record, not an independently checked local git tree.
+
+Coverage and limits (locators refer to these pinned copies):
+
+- Young §§3.1–3.7 pp. 11–14: SLL, IXH/IXL/IYH/IYL, ignored/repeated prefixes,
+  ED aliases/holes, IN F,(C)/ED 70, OUT (C),0/ED 71, DD/FD CB register copies
+  and BIT aliases. §§2.3, 4.1–4.7 pp. 8, 15–18 and §§8.1–8.11 pp. 26–35
+  give per-instruction flag bits 5/3, including arithmetic/CP, accumulator
+  rotates, block memory/I/O, BIT, DAA and SCF/CCF. §4.1's hidden-register
+  account explicitly has untested cases; it is not a complete MEMPTR table.
+  §8.5 p. 30 gives A-derived SCF/CCF bits without the later Q distinction;
+  §4.5 p. 17 discusses block repetition/interruptibility without Banks' later
+  interrupted-repeat flag findings. This revision supplies no systematic
+  NMOS/CMOS comparison or CMOS ED 71 output claim. §1.1 describes collected
+  information, checking and contributors; §3.4 reports Gerton Lunter's physical
+  bus experiment on a Spectrum, without chip markings. Bibliography [1], [2],
+  [5] exposes borrowed origins, including the Cringle exercisers and emulator
+  documentation; linked implementations/documentation were not consulted.
+- MEMPTR opening paragraphs and instruction list: experiment-based reconstruction
+  of 14 low MEMPTR bits using CPI/CPD and BIT n,(HL)'s observable flag bits;
+  rules for loads, ALU pairs, control transfers, block operations, I/O,
+  indexed addressing and interrupts. Footer credits theory to boo_boo/Kladov
+  and real-chip testing to Wlodek, CHRV, icebear, molodcov_alex and goodboy.
+  It names KP1858BM1/T34BM1 exceptions, without identifying the ordinary
+  Zilog specimens or proving NMOS/CMOS equivalence. It does not cover Q,
+  prefix/ED-hole decoding, SLL or DD CB copies; mentioning interrupts does
+  not establish repeat-step flags. Its citations to Young and another project
+  are attributions only; the linked documentation was not read.
+- Banks `Undocumented-Flags.md`, “Interrupted block instructions” and “SCF/CCF”:
+  reported interrupted LDxR/CPxR/INxR/OTxR flags, predecessor-dependent SCF/CCF
+  bits (Q), POP AF and a literal `Update 9/7/2026` about DD/FD before SCF/CCF.
+  `Unstable-CCF-SCF-Behaviour.md`, “Introduction”, “Conclusions”, “Test Program”:
+  Acorn Z80 Second Processor, 2.0/3.5/6.0 MHz, 256×256 A/F screen tests,
+  X/Y × CCF/SCF × four predecessor sequences (POP AF, plus NOP, LD R,A or
+  XOR 00); stable and clock-dependent/random results for differing parts.
+  `Default-Logic-Mapping.md` and the Cypress/Windows capture notes describe
+  logic-analyser acquisition, but the SCF/CCF matrix is a screen measurement,
+  not a supplied raw bus log. Result pages contain **links only**: chip photos
+  and capture images are absent from this Markdown set and were not inspected.
+  Exact package markings/date codes absent from text remain unverified.
+  `NMI-during-EI-Anomaly.md` is retained in the supplied export inventory but
+  its simulator discussion is not hardware evidence for this work.
+
+Banks result-page specimen inventory (each individual page links X/Y captures
+at all three clock speeds; aggregate pages `Results-2.0-MHz.md`,
+`Results-3.5-MHz.md`, `Results-6.0-MHz.md` and `Results-All.md` collect the
+same eleven entries, not independent experiments):
+
+| Page | Part/date-code scope stated by Markdown |
+|---|---|
+| `Results-Zilog-NMOS-Date-Code-8039.md` | Zilog NMOS, 8039 |
+| `Results-Zilog-NMOS-Date-Code-8644.md` | Zilog NMOS, 8644 |
+| `Results-Zilog-NMOS-Date-Code-8811.md` | Zilog NMOS, 8811; conclusions say original Spectrum +2B CPU |
+| `Results-Zilog-NMOS-Date-Code-8817.md` | Filename/aggregate heading says NMOS 8817, but page heading says **Zilog CMOS** and image roots say `zilog_cmos_8817`; technology unresolved |
+| `Results-Zilog-CMOS-Date-Code-9044.md` | Zilog CMOS, 9044 |
+| `Results-Zilog-CMOS-Date-Code-0047.md` | Zilog CMOS, 0047 |
+| `Results-Zilog-CMOS-Date-Code-1930.md` | Zilog CMOS, 1930 |
+| `Results-SGS-NMOS.md` | SGS NMOS; date code/package not stated in Markdown |
+| `Results-NEC-NMOS.md` | NEC NMOS; date code/package not stated in Markdown |
+| `Results-ST-CMOS.md` | ST CMOS; date code/package not stated in Markdown |
+| `Results-NEC-CMOS.md` | NEC CMOS; date code/package not stated in Markdown |
+
+Preserve source discrepancies: the unstable-behaviour conclusions call the
+unstable Zilog NMOS specimen **8634**, whereas result-page names, headings and
+image paths say **8644**. Its index also contains a stale `Results Zilog CMOS`
+link. These are unresolved source readings, not licence to silently repair
+labels or extend results across revisions. That specimen inventory is for the
+SCF/CCF screen tests; it does not identify the part behind every interrupted-block
+statement in the earlier page, whose Zilog NMOS attribution is not date-coded.
+
+Independence: Young is a compilation, not an identified-silicon capture;
+MEMPTR cites Young but reports additional experiments by a separate credited
+team. Banks starts from Young (misnaming its author in his opening attribution),
+yet reports his own measurements on a different host. His SCF/CCF page credits
+Patrik Rak's 2012 discovery; z80test's README cites Banks in turn. Do not count
+those retellings as independent discoveries. Banks' own measurements and Rak's
+Spectrum-derived CRCs are distinct reported acquisition origins only where they
+discriminate the same fact; their shared Q narrative is not another key. Young
+also cites Cringle's exercisers, so a Young statement and a ZEXALL CRC are not
+automatically independent. ZEXALL/ZEXDOC share the Cringle lineage, and their
+unnamed silicon leaves both falsifiers only. MEMPTR's reported experiments do
+not promote its third-party copy to an identified-hardware B witness. No blanket
+pairing or behaviour ruling is made here; trace origin and coverage per fact.
+
+Individual wiki pins (relative to `zilog/z80-undocumented/z80decoder-wiki/`):
+
+| Page | Bytes | sha256 |
+|---|---|---|
+| `Default-Logic-Mapping.md` | 944 | `931bfd96ed2d5729ecc28aff7366d8256f5b1c0fb34e5a38fcadda66ea2d651f` |
+| `Home.md` | 85 | `0767978802f8a48c9f583e7d8d0fe1132f31d68552761c4cd0ba90291fcfda16` |
+| `NMI-during-EI-Anomaly.md` | 3930 | `0effe42fea3f73f690985d648b673d50c98552adf6ea1f807d1fa15c256b50ba` |
+| `Results-2.0-MHz.md` | 8941 | `9e7f5f7e4c54bd9098abf65c5ac94330a9cf76e8c07375576a8bf4a2ddfaadf3` |
+| `Results-3.5-MHz.md` | 8941 | `b3eafd0ed70ddbb5d354252423d6a9984b80433590c5e928ec377b6802762549` |
+| `Results-6.0-MHz.md` | 8941 | `8d3333faa378b674f0d6568196e296bdf5821545ea62daa22ca139ae4fdb7622` |
+| `Results-All.md` | 28649 | `5ce5d940b32d80925bbd9f42ea54e7d274314e4096484a4e25195a0003f0256a` |
+| `Results-NEC-CMOS.md` | 2379 | `a79cd2d6383cb0ab5f2eca9a1c2cf5eb3fd36b90606517384667dd9b6c46b33a` |
+| `Results-NEC-NMOS.md` | 2379 | `9df9211d7c8027b20fc7d3f26e4f1f370048e98deb20b0ce5a25024cd44ce059` |
+| `Results-SGS-NMOS.md` | 2379 | `836bbf0328fc9164dfc1cb2053a939319a76f51c1928eab6acea8075ede85cfe` |
+| `Results-ST-CMOS.md` | 2329 | `3668554040b4783272ef7fc59849c16d44a6795db004c570abf1865a29dc3433` |
+| `Results-Zilog-CMOS-Date-Code-0047.md` | 2724 | `6a56dbf01138c3f38657e5684811f4d4632224572c769cb049185b6c0b1d5ea5` |
+| `Results-Zilog-CMOS-Date-Code-1930.md` | 2724 | `d18a367641a46066fa1fd6a42023f0b529a9c762cda17c184aaba40aa370955d` |
+| `Results-Zilog-CMOS-Date-Code-9044.md` | 2724 | `ece751340640e8db0c75c85cbc44e2c3156ece2dc2e8c83a91a318490dda130c` |
+| `Results-Zilog-NMOS-Date-Code-8039.md` | 2739 | `44f80895f0dec8bf54a2a6c66f49aece86cc3f7c378c58128f1cd0256e8fdd4e` |
+| `Results-Zilog-NMOS-Date-Code-8644.md` | 2739 | `5fc5f12e166b622909329c3b2feef7016ba034a347defbf153879ec4ab6c926c` |
+| `Results-Zilog-NMOS-Date-Code-8811.md` | 2739 | `7e0f7a32e96fde80cac6559c5dcfe847a5e6b2329ba409ddac5134812f9287e9` |
+| `Results-Zilog-NMOS-Date-Code-8817.md` | 2724 | `f09dd650ed77dde7f98745760060e88d9d7d991e18ecc226e30ff2ec0dc8b4ae` |
+| `Undocumented-Flags.md` | 3565 | `a5b100b3046e88485a939b5f1a0a76536c4ec59c050ca800db4b76fa1652e9ef` |
+| `Unstable-CCF-SCF-Behaviour.md` | 8319 | `485c12182ee05bffc734fd30545e763f81b6f5723eaf94aaa7da9e3c10395f01` |
+| `Using-a-Cypress-FX2LP-as-a-Capture-Device.md` | 173 | `d3e1c6625e16c54209464bcc8dab064988409d671493a6ff8f01034b9171e1d0` |
+| `Windows-Capture.md` | 232 | `06070c5111ba4ec2e21d3a97ca880a6693ae4569582c0333f4ece48050e3f2a1` |
 
 ## x86-64 psABI (process initialisation, syscall ABI, exception→signal map) — **FETCH-ONLY**
 

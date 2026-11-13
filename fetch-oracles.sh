@@ -104,11 +104,21 @@ Z80TM1977_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/03-0029-0
 Z80ALPM1978_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/Z80_Assembly_Language_Programming_Manual_197801.pdf"
 Z80PS1978_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/03-0027-02_Z80_CPU_Product_Specification_Mar78.pdf"
 MK78515_URL="http://bitsavers.trailing-edge.com/components/mostek/Z80/MK78515_Mostek_Z80_Programming_Manual_V2.0_Oct1978.pdf"
+# Z80 undocumented-behaviour sources (M6): written analyses and a measurement wiki.
+# The wiki uses a git-pinned Markdown export, not unverified raw-page endpoints.
+Z80_YOUNG_URL="https://web.archive.org/web/20260108105255id_/http://www.myquest.nl/z80undocumented/z80-documented-v0.91.pdf"
+# Third-party 2014 gist copy of the 2006 text, not the authors' original host.
+Z80_MEMPTR_URL="https://gist.githubusercontent.com/drhelius/8497817/raw/0157588ecd91bb82eec06d85d5be0ca2a3472c30/Z80%20MEMPTR"
+Z80DECODER_WIKI_URL="https://github.com/hoglet67/Z80Decoder.wiki.git"
+Z80DECODER_WIKI_COMMIT="49e542dd40c36ef7367cb5806292764416dc987a"
+Z80DECODER_WIKI_CLONE=".upstream/z80decoder-wiki"
+Z80DECODER_WIKI_DEST="zilog/z80-undocumented/z80decoder-wiki"
 # 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
 CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
 # Z80 CPU exercisers (x80 oracles): unchanged import of the original yaze 1.14.
 YAZE114_COMMIT="993d8647eabf95c61e49b134198a240ab577358b"
 RAW_YAZE114="https://raw.githubusercontent.com/begoon/yaze/${YAZE114_COMMIT}"
+Z80TEST_URL="https://github.com/raxoft/z80test/releases/download/v1.2a/z80test-1.2a.zip"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -451,12 +461,20 @@ intel/i8085-undocumented/zima-8085-decode-rom.html ${I8085_ZIMA_DECODE_ROM_URL} 
 # FETCH-ONLY by maintainer decision: run locally as falsifying oracles, never committed.
 # Pin both CP/M programs and their sources; COPYING supplies the GPL v2 text.
 # ZEXDOC's undocumented-encoding groups must be removed from the in-memory test table
-# by a digest-keyed host and reported "not run"; see x80 PROVENANCE.md §2. No ZEXALL.
+# by a digest-keyed M4 host and reported "not run"; see x80 PROVENANCE.md §2.
+# ZEXALL is pinned for later undocumented-behaviour work, not admitted to that host.
 z80-exercisers/prelim.com ${RAW_YAZE114}/test/prelim.com 1000
 z80-exercisers/prelim.z80 ${RAW_YAZE114}/test/prelim.z80 4000
 z80-exercisers/zexdoc.com ${RAW_YAZE114}/test/zexdoc.com 8000
 z80-exercisers/zexdoc.z80 ${RAW_YAZE114}/test/zexdoc.z80 40000
+z80-exercisers/zexall.com ${RAW_YAZE114}/test/zexall.com 8000
+z80-exercisers/zexall.z80 ${RAW_YAZE114}/test/zexall.z80 40000
 z80-exercisers/COPYING ${RAW_YAZE114}/COPYING 17000
+# Patrik Rak, v1.2a (2 December 2023), MIT; Spectrum host, not CP/M.
+z80-exercisers/z80test-1.2a.zip ${Z80TEST_URL} 60000
+# Written analyses; the wiki Markdown is exported separately from its pinned git tree.
+zilog/z80-undocumented/young-undocumented-z80-documented-v0.91.pdf ${Z80_YOUNG_URL} 270000
+zilog/z80-undocumented/memptr-boo-boo-2006.txt ${Z80_MEMPTR_URL} 5000
 # --- NEC V20/V30 manual (x86jit) — (c) NEC Electronics, no redistribution licence. Cite-only,
 # kept local. uPD70108 (V20) and uPD70116 (V30) User's Manual (stock no. ${NECV20UM_STOCK},
 # October 1986, 228 pp, a scan with an OCR text layer) — the PRIMARY source for the V20/V30
@@ -506,6 +524,57 @@ EOF
 }
 
 table_rows(){ grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$'; }
+
+# Explicit Markdown inventory: no decoder/model implementation or image corpus.
+# Export git blobs verbatim, avoiding checkout filters and platform line endings.
+z80decoder_wiki_pages(){ cat <<'EOF'
+Default-Logic-Mapping.md
+Home.md
+NMI-during-EI-Anomaly.md
+Results-2.0-MHz.md
+Results-3.5-MHz.md
+Results-6.0-MHz.md
+Results-All.md
+Results-NEC-CMOS.md
+Results-NEC-NMOS.md
+Results-SGS-NMOS.md
+Results-ST-CMOS.md
+Results-Zilog-CMOS-Date-Code-0047.md
+Results-Zilog-CMOS-Date-Code-1930.md
+Results-Zilog-CMOS-Date-Code-9044.md
+Results-Zilog-NMOS-Date-Code-8039.md
+Results-Zilog-NMOS-Date-Code-8644.md
+Results-Zilog-NMOS-Date-Code-8811.md
+Results-Zilog-NMOS-Date-Code-8817.md
+Undocumented-Flags.md
+Unstable-CCF-SCF-Behaviour.md
+Using-a-Cypress-FX2LP-as-a-Capture-Device.md
+Windows-Capture.md
+EOF
+}
+
+z80decoder_wiki_paths(){
+  local page
+  while read -r page; do printf '%s/%s\n' "$Z80DECODER_WIKI_DEST" "$page"; done < <(z80decoder_wiki_pages)
+}
+
+fetch_z80decoder_wiki(){
+  mkdir -p "$(dirname "$Z80DECODER_WIKI_CLONE")" || return 1
+  if [ ! -d "$Z80DECODER_WIKI_CLONE/.git" ]; then
+    git clone --no-checkout "$Z80DECODER_WIKI_URL" "$Z80DECODER_WIKI_CLONE" || return 1
+  fi
+  git -C "$Z80DECODER_WIKI_CLONE" fetch --depth 1 origin "$Z80DECODER_WIKI_COMMIT" || return 1
+  local page tmp
+  mkdir -p "$Z80DECODER_WIKI_DEST" || return 1
+  while read -r page; do
+    tmp="$(mktemp)" || return 1
+    if ! git -C "$Z80DECODER_WIKI_CLONE" show "$Z80DECODER_WIKI_COMMIT:$page" > "$tmp"; then
+      rm -f "$tmp"
+      return 1
+    fi
+    mv "$tmp" "$Z80DECODER_WIKI_DEST/$page" || { rm -f "$tmp"; return 1; }
+  done < <(z80decoder_wiki_pages)
+}
 
 # --- provenance quarantine (MANIFEST.md "Second-hand blocks in a clean source") ---
 # One file in the OpenOrbis tree cites a PS4 EMULATOR project as the source of its own
@@ -638,6 +707,9 @@ fetch_all(){
     fetch_file "$url" "$dest" "$min" || warn "grab $dest manually if the archive is down"
   done < <(fetchonly_files | table_rows)
 
+  log "Z80Decoder wiki @ ${Z80DECODER_WIKI_COMMIT:0:10} (fetch-only Markdown export)"
+  fetch_z80decoder_wiki || warn "Z80Decoder wiki export incomplete — see MANIFEST.md"
+
   log "vendored sources — refreshing the committed copies from upstream"
   while read -r dest url min; do
     fetch_file "$url" "$dest" "$min" || true
@@ -730,6 +802,9 @@ write_sums(){
   while read -r p _ _; do
     [ -f "$p" ] && PIN["$p"]="$(pin_hash "$p")"
   done < <(fetchonly_files | table_rows)
+  while read -r p; do
+    [ -f "$p" ] && PIN["$p"]="$(pin_hash "$p")"
+  done < <(z80decoder_wiki_paths)
   {
     echo "# Sources that may NOT be redistributed (© AMD ISA PDFs; the Khronos SPIR-V spec)."
     echo "# They are gitignored — these hashes ARE the pin: fetch them and check yourself."
@@ -878,6 +953,42 @@ verify_upstream(){ # -> 0 ok, 3 upstream moved, 4 unreachable.  Assumes offline 
     fi
     if [ "$mismatched" -eq 0 ]; then printf '   %s vendored Mesa files identical to upstream\n' "$nmesa"
     else moved=$((moved+mismatched)); fi
+  fi
+
+  log "diffing the Z80Decoder wiki pins against $Z80DECODER_WIKI_URL @ ${Z80DECODER_WIKI_COMMIT:0:10}"
+  if ! { mkdir -p "$(dirname "$Z80DECODER_WIKI_CLONE")" &&
+         { [ -d "$Z80DECODER_WIKI_CLONE/.git" ] ||
+           git clone --no-checkout "$Z80DECODER_WIKI_URL" "$Z80DECODER_WIKI_CLONE"; } &&
+         git -C "$Z80DECODER_WIKI_CLONE" fetch --depth 1 origin "$Z80DECODER_WIKI_COMMIT";
+       } 2>/dev/null; then
+    warn "UNREACHABLE Z80Decoder wiki ($Z80DECODER_WIKI_URL) — pins not checked against upstream"
+    unreachable=$((unreachable+1))
+  else
+    declare -A WIKI_REC=()
+    while read -r h p; do WIKI_REC["$p"]="$h"; done < <(grep -v '^#' SHA256SUMS.fetched)
+    local page nwiki=0
+    while read -r page; do
+      dest="$Z80DECODER_WIKI_DEST/$page"
+      loc="${WIKI_REC[$dest]:-}"
+      if [ -z "$loc" ]; then
+        err "not recorded in SHA256SUMS.fetched: $dest"
+        moved=$((moved+1)); continue
+      fi
+      # Read raw blobs, bypassing checkout filters; authenticate every recorded page
+      # even when its fetch-only local export is absent.
+      if ! git -C "$Z80DECODER_WIKI_CLONE" cat-file blob "$Z80DECODER_WIKI_COMMIT:$page" > "$tmpd/blob" 2>/dev/null; then
+        warn "UNREACHABLE $dest <- $Z80DECODER_WIKI_URL @ $Z80DECODER_WIKI_COMMIT"
+        unreachable=$((unreachable+1)); continue
+      fi
+      up=$(pin_hash "$dest" "$tmpd/blob")
+      if [ "$up" = "$loc" ]; then nwiki=$((nwiki+1))
+      else
+        err "UPSTREAM MOVED  $dest"
+        printf '     recorded %s\n     upstream %s\n' "$loc" "$up"
+        moved=$((moved+1))
+      fi
+    done < <(z80decoder_wiki_pages)
+    printf '   %s Z80Decoder wiki pages identical to upstream\n' "$nwiki"
   fi
 
   log "fetch-only pins vs upstream (only what is present locally)"
