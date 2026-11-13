@@ -88,6 +88,14 @@ I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301
 I8085UM_ORDER="205775-002"   # MCS-80/85 Family User's Manual (January 1983)
 I8085UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/MCS80_85_Users_Manual_Jan83.pdf"
 IECH1988_URL="http://bitsavers.trailing-edge.com/components/intel/_dataBooks/1988_Intel_Embedded_Controller_Handbook_Volume_I_8-Bit.pdf"
+# 8085 undocumented-instruction sources (M6): fixed Wayback captures except the
+# Tundra manual, whose document number and hash identify the bitsavers mirror copy.
+I8085_DEHNHARDT_SORENSEN_URL="https://web.archive.org/web/20251203201036id_/https://cdn.hackaday.io/files/1766537557921952/UnDoc8085Instructions.pdf"
+I8085_TUNDRA_URL="http://bitsavers.trailing-edge.com/components/tundra/9000000.MD302.01_Tundra_8000_Series_Components_Manual_1996.pdf"
+I8085_SHIRRIFF_UNDOCUMENTED_FLAGS_URL="https://web.archive.org/web/20260905021235id_/http://www.righto.com/2013/02/looking-at-silicon-to-understanding.html"
+I8085_SHIRRIFF_FLAG_CIRCUITS_URL="https://web.archive.org/web/20261027125023id_/http://www.righto.com/2013/07/reverse-engineering-flag-circuits-in.html"
+I8085_SHIRRIFF_ALU_URL="https://web.archive.org/web/20261014020057id_/http://www.righto.com/2013/07/reverse-engineering-8085s-alu-and-its.html"
+I8085_ZIMA_DECODE_ROM_URL="https://web.archive.org/web/20260606111153id_/http://www.pastraiser.com/reverse/AMD9085/instruction_decode_rom.html"
 NECV20UM_URL="http://bitsavers.trailing-edge.com/components/nec/V-Series/V20_V30_Users_Manual_Oct86.pdf"
 # Z80 sources for x80 (M4): the vendor's UM008011-0816 file at a fixed Wayback capture;
 # four historical scans from the same bitsavers mirror as the Intel and NEC manuals.
@@ -411,6 +419,16 @@ intel/i8085-um.pdf ${I8085UM_URL} 5000000
 # (September 1987), printed pp. 16-11 to 16-30 (PDF pages 958 to 977). Second source for the
 # 8085 (pins, interrupt table, machine-cycle chart, instruction summary; no per-instruction states).
 intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
+# --- 8085 undocumented-instruction sources (M6) — cite-only, no redistribution grant.
+# Dehnhardt/Sorensen (1979) and Tundra (9000000.MD302.01, copyright 1996) share one
+# written origin. Shirriff and Zima analyse die data; see MANIFEST.md for silicon scope.
+# The two .html.gz pins are gzip-encoded capture bytes stored as-is by plain curl -sL.
+intel/i8085-undocumented/dehnhardt-sorensen-1979.pdf ${I8085_DEHNHARDT_SORENSEN_URL} 250000
+intel/i8085-undocumented/tundra-8000-series-1996.pdf ${I8085_TUNDRA_URL} 2000000
+intel/i8085-undocumented/shirriff-8085-undocumented-flags.html.gz ${I8085_SHIRRIFF_UNDOCUMENTED_FLAGS_URL} 30000
+intel/i8085-undocumented/shirriff-8085-flag-circuits.html.gz ${I8085_SHIRRIFF_FLAG_CIRCUITS_URL} 25000
+intel/i8085-undocumented/shirriff-8085-alu.html ${I8085_SHIRRIFF_ALU_URL} 150000
+intel/i8085-undocumented/zima-8085-decode-rom.html ${I8085_ZIMA_DECODE_ROM_URL} 50000
 # --- 8080 CPU exercisers (x80 oracles) — GPL-2.0-or-later: Frank D. Cringle's Z80
 # instruction exerciser and preliminary test (1994), modified for the 8080 by Ian Bartholomew
 # (the exerciser in February 2009); Mike Douglas (May 2013) added to the exerciser the success
