@@ -98,6 +98,9 @@ Z80PS1978_URL="http://bitsavers.trailing-edge.com/components/zilog/z80/03-0027-0
 MK78515_URL="http://bitsavers.trailing-edge.com/components/mostek/Z80/MK78515_Mostek_Z80_Programming_Manual_V2.0_Oct1978.pdf"
 # 8080 CPU exercisers for x80, from the download area of their 2013 maintainer (Mike Douglas).
 CPU8080_TESTS_URL="https://altairclone.com/downloads/cpu_tests"
+# Z80 CPU exercisers (x80 oracles): unchanged import of the original yaze 1.14.
+YAZE114_COMMIT="993d8647eabf95c61e49b134198a240ab577358b"
+RAW_YAZE114="https://raw.githubusercontent.com/begoon/yaze/${YAZE114_COMMIT}"
 RAW_FREEBSD="https://raw.githubusercontent.com/freebsd/freebsd-src/${FREEBSD_REF}"
 RAW_VULKAN="https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/${VULKAN_DOCS_REF}"
 MESA_URL="https://gitlab.freedesktop.org/mesa/mesa.git"
@@ -426,6 +429,16 @@ intel/intel-embedded-controller-handbook-1988-v1.pdf ${IECH1988_URL} 30000000
 # 20151108135453 of his 8080/8085 CPU Exerciser page, 4 pp): the per-chip table of measured
 # CRCs from which 8080EXM's expected values come, with contributor notes. No licence: cite-only.
 8080-exercisers/8080-8085-cpu-exerciser-results.pdf ${CPU8080_TESTS_URL}/8080_8085%20CPU%20Exerciser.pdf 100000
+# --- Z80 CPU exercisers (x80 oracles) — GPL-2.0-or-later, Frank D. Cringle (1994).
+# FETCH-ONLY by maintainer decision: run locally as falsifying oracles, never committed.
+# Pin both CP/M programs and their sources; COPYING supplies the GPL v2 text.
+# ZEXDOC's undocumented-encoding groups must be removed from the in-memory test table
+# by a digest-keyed host and reported "not run"; see x80 PROVENANCE.md §2. No ZEXALL.
+z80-exercisers/prelim.com ${RAW_YAZE114}/test/prelim.com 1000
+z80-exercisers/prelim.z80 ${RAW_YAZE114}/test/prelim.z80 4000
+z80-exercisers/zexdoc.com ${RAW_YAZE114}/test/zexdoc.com 8000
+z80-exercisers/zexdoc.z80 ${RAW_YAZE114}/test/zexdoc.z80 40000
+z80-exercisers/COPYING ${RAW_YAZE114}/COPYING 17000
 # --- NEC V20/V30 manual (x86jit) — (c) NEC Electronics, no redistribution licence. Cite-only,
 # kept local. uPD70108 (V20) and uPD70116 (V30) User's Manual (stock no. ${NECV20UM_STOCK},
 # October 1986, 228 pp, a scan with an OCR text layer) — the PRIMARY source for the V20/V30

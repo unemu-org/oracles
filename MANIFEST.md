@@ -360,6 +360,57 @@ manuals below are what settles the disagreement.
   the author's page, not Intel documentation); x80 cites it before treating a mismatch as a
   defect.
 
+## Z80 CPU exercisers (x80 oracles: falsify, never define) — **FETCH-ONLY**
+
+| File | Program | Bytes | sha256 | License | Covers |
+|---|---|---|---|---|---|
+| `z80-exercisers/prelim.com` | Preliminary Z80 test (CP/M, load 0100h) | 1280 | `3b3578f19030a4df7e25ce852f763af26053b12582a576c4dffb014aa7c590d1` | GPL-2.0-or-later | Sanity test: registers and alternate banks, stack, compares, control transfers, indexed addressing; documented encodings only |
+| `z80-exercisers/prelim.z80` | Assembly source of prelim.com | 5384 | `afefdd15c42ea8d0c123ad099108962ca5ad26b3ffd043d2ba578c2b01cab1fd` | GPL-2.0-or-later | Copyright and GPL-2.0-or-later notice; host and test sequence |
+| `z80-exercisers/zexdoc.com` | ZEXDOC instruction exerciser (CP/M, load 0100h) | 8704 | `34923a7ed82285d3038b2d54bd64899e12173eebb61f9d07b4fc72e78af2ae8f` | GPL-2.0-or-later | 67 groups: 58 eligible for judgment, 9 not run because their vectors include undocumented encodings; documented flag masks exclude bits 5 and 3 |
+| `z80-exercisers/zexdoc.z80` | Assembly source of zexdoc.com | 40283 | `4f7b83d5ed1b4ce34f1b6f19b996e40588e3698db9aa2e31bece377db5b91d99` | GPL-2.0-or-later | Descriptors, increment/shift vectors and expected CRCs; complete descriptor data and table order match the pinned binary |
+| `z80-exercisers/COPYING` | GNU General Public License, version 2 | 17990 | `1ca3e8f71b7de618968e7ea9fe47822d9e704dc476aef8544033abedec355225` | GPL-2.0 text | Licence text referenced by both source headers; their notices permit version 2 or later |
+
+- Source: [begoon/yaze](https://github.com/begoon/yaze/tree/993d8647eabf95c61e49b134198a240ab577358b),
+  pinned at `993d8647eabf95c61e49b134198a240ab577358b`.
+  Raw base: `https://raw.githubusercontent.com/begoon/yaze/993d8647eabf95c61e49b134198a240ab577358b/`;
+  upstream paths are `test/prelim.com`, `test/prelim.z80`, `test/zexdoc.com`,
+  `test/zexdoc.z80`, and `COPYING`.
+- Lineage: Frank D. Cringle's preliminary test and instruction exerciser, © 1994,
+  distributed with original yaze 1.14. The repository README describes an unchanged
+  import; the import commit is `4424f29` (“Imported the original version 1.14”,
+  2012-10-30). This records the supplied lineage, without relying on the emulator
+  implementation. Both assembly headers grant GPL version 2 or later; COPYING is GPL v2.
+- Fetch-only by the x80 maintainer's decision (2026-11-13): these GPL artifacts,
+  including sources and COPYING, stay local and are never committed to this stash
+  or incorporated into consuming library code.
+- Host services: both load and start at 0100h, use BDOS 2 (character in E) and 9
+  ('$'-terminated string at DE) through `CALL 0005h`, and exit through `JP 0000h`.
+  The preliminary test needs a usable initial SP before its first CALL; it later
+  uses register-test buffers and its own stack (0600h in the pinned binary).
+  ZEXDOC starts with `LD HL,(0006h); LD SP,HL`, so the host must supply a safe
+  top-of-stack word there. It saves/restores SP around each case, temporarily
+  loading SP from the test state. Its writable RAM contains self-modifying code;
+  it uses DI/EI, but these campaigns need no injected interrupts or port devices.
+  Early preliminary failures may jump to zero without output; later failures print
+  an address. Successful completion text must be checked, not merely program exit.
+- CRC provenance: zexdoc.z80's introductory comments say its expected values were
+  found empirically on a real Z80, without identifying the part, revision, capture
+  or contributor per group. It attributes the documented flag selection to the
+  Mostek Z80 Technical Manual. This is a source claim, not an independently
+  authenticated hardware capture. The preliminary program has no expected CRC.
+- M4 uses documented Z80 encodings only. Of the 67 table entries, the groups
+  `alu8rx`, `incxh`, `incxl`, `incyh`, `incyl`, `ld8ixy`, `ld8rrx`,
+  `rotxy` and `rotz80` are **not run**. Their index-half, ignored-prefix or SLL
+  encodings fall outside that set. A later x80 host
+  must remove their pointers from the guest's in-memory table only after matching
+  the pinned binary digest and report each as “not run”. It must not execute them
+  and suppress Unsupported or reinterpret their CRCs. The complete ordered audit
+  and offsets are in x80's `PROVENANCE.md` §2; no Z80 harness is added here.
+- An oracle can falsify a reading, never license a behavior (x80 `PROVENANCE.md` §2).
+  Eligibility for judgment is an encoding audit, not a measured PASS result.
+  ZEXALL is not used because it compares flag bits 5 and 3; no ZEXALL artifact is
+  fetched. Patrik Rak's z80test is an evaluated candidate only, with no fetch pin.
+
 ## NEC V20/V30 manual (V-series models, 8080 emulation mode) — **FETCH-ONLY**
 
 | File | Title | Pages | sha256 | License | Covers |
