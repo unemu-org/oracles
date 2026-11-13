@@ -10,8 +10,9 @@ Three projects draw on this stash, and their sources are grouped separately:
   sections below are unchanged and the doc-9 ledger references still resolve.
 - **x86jit** (x86-64 → host recompiler) — the Intel SDM and AMD64 APM, the x86-64 psABI, the
   Linux x86 syscall tables and process/signal uapi, and the SingleStepTests 80286 corpus with
-  its MOO container format, and the NEC V20/V30 user's manual. See **x86 sources** and
-  **NEC V20/V30 manual** below.
+  its MOO container format, the 8088/V20 suite documentation, the early Intel x86 CPU
+  manuals, and the NEC V20/V30 user's manual. See **x86 sources**, **Intel 8086 family
+  manual**, **Intel iAPX 86/88, 186/188 programmer's reference** and **NEC V20/V30 manual** below.
 - **x80** (Intel 8080-family interpreter) — the Intel 8080 user's manual and the 8080/8085
   assembly-language manual, the 8085 sources, and two 8080 CPU exercisers as oracles. See
   **8080 CPU manuals**, **8085 CPU sources** and **8080 CPU exercisers** below.
@@ -301,6 +302,62 @@ manuals below are what settles the disagreement.
 - **The SDM is the primary** oracle. Cite the APM when it disambiguates something the SDM
   leaves undefined, or when a Jaguar-specific behaviour is at issue — and say which manual
   you are citing, because "undefined" in one is not "undefined" in the other.
+
+## Intel 8086 family manual (8086/8088 instructions, flags and bus) — **FETCH-ONLY**
+
+| File | Title / publisher / edition | Bytes | Pages | sha256 | Licence |
+|---|---|---|---|---|---|
+| `intel/i8086-um.pdf` | Intel Corporation, The 8086 Family User's Manual, October 1979, Order Number 9800722-03 | 62,967,963 | 748 | `717194ec03520d6499a40523abdfd4ed15a2b8ccc45a21c653e2b443c248664c` | © Intel Corporation 1978, 1979; cite-only, no redistribution licence |
+
+- Fetch URL: `https://bitsavers.trailing-edge.com/components/intel/8086/9800722-03_The_8086_Family_Users_Manual_Oct79.pdf`.
+  Primary archive: bitsavers.org, at
+  `https://bitsavers.org/components/intel/8086/9800722-03_The_8086_Family_Users_Manual_Oct79.pdf`.
+  The fetch entry uses the trailing-edge mirror because the primary archive answered curl
+  with HTTP 403. Byte identity between the two hosts has not been independently checked.
+- The scanned cover (PDF page 1) confirms the title, October 1979 edition, copyright years
+  and order number. PDF page 3 (printed ii) prohibits copying or reproduction without prior
+  written consent. **Fetch-only:** the PDF stays gitignored and is not redistributed here.
+- **Witnesses:** Chapter 2, The 8086 and 8088 Central Processing Units: execution unit and
+  bus interface unit (p. 2-5), flags (p. 2-7), memory and address generation (pp. 2-8–15),
+  processor control, interrupts and reset (pp. 2-22–30), instruction descriptions and flag
+  effects (pp. 2-30–68), addressing modes (pp. 2-68–72). Chapter 4 supplies hardware
+  reference information, including bus operation (p. 4-5), minimum/maximum mode
+  (p. 4-10), interrupts (p. 4-16), and instruction encoding/decoding (p. 4-18).
+  Appendix B includes the 8086 and 8088 device specifications.
+- **x86jit decision-23 P1 (xj-y1p), C2:** primary source for the 8086/8088 models'
+  documented instruction set, flags, bus interface and model-specific behaviour. Later
+  Intel CPU rules must not silently replace the rules in this edition.
+- SHA256 and byte count were checked from the local PDF; `pdfinfo` reports 748 PDF pages,
+  including covers and front matter. This is a scan with an OCR text layer (Paper Capture,
+  2015): verify cited values against page images and cite the printed chapter/page numbers.
+
+## Intel iAPX 86/88, 186/188 programmer's reference (early x86 CPU semantics) — **FETCH-ONLY**
+
+| File | Title / publisher / edition | Bytes | Pages | sha256 | Licence |
+|---|---|---|---|---|---|
+| `intel/i186-prm.pdf` | Intel Corporation, iAPX 86/88, 186/188 User's Manual, Programmer's Reference, May 1983, Order Number 210911-001 | 33,392,201 | 550 | `7f33bead2b7111b6871b50f14368531b90c30d960ca47865c5b0d8aa5fb55ed2` | © Intel Corporation 1983; cite-only, no redistribution grant found |
+
+- Fetch URL: `https://bitsavers.trailing-edge.com/components/intel/80186/210911-001_iAPX86_88_186_188_Programmers_Reference_1983.pdf`.
+  Primary archive: bitsavers.org, at
+  `https://bitsavers.org/components/intel/80186/210911-001_iAPX86_88_186_188_Programmers_Reference_1983.pdf`.
+  The fetch entry uses the same archival mirror as the 8086 manual. Byte identity between
+  the two hosts has not been independently checked.
+- The scanned cover (PDF page 1, lower right) prints **Order Number: 210911-001**. The OCR
+  misses this cover text; the number was checked against the rendered image. The title page
+  (PDF page 2) dates the manual **May 1983**; the notice on PDF page 3 gives the 1983 Intel
+  copyright. No redistribution grant was found. **Fetch-only:** the PDF stays gitignored
+  and is not redistributed here.
+- **Witnesses:** §2.6, The 80186,188 Extensions (p. 2-10); Chapter 3, architecture and
+  instructions, including register/flag structure (§3.3), memory structure (§3.4),
+  addressing (§3.6), and the instruction set (§3.7, beginning p. 3-19); Chapter 4,
+  8086/8088 hardware design and interrupt structure; Chapter 5, 80186/80188 CPU
+  enhancements (§5.2), bus structure (§5.3), interrupts (§5.4), and integrated peripherals.
+- **x86jit decision-23 P3 (xj-5d9):** second witness for 8086/8088 and primary source
+  for 80186/80188 model work in C5. Apply the manual's distinctions between CPU models;
+  an 80186 extension does not establish 8086 support.
+- SHA256 and byte count were checked from the local PDF; `pdfinfo` reports 550 PDF pages,
+  including covers and front matter. This is a scan with an OCR text layer (Paper Capture,
+  2016): verify cited values against page images and cite the printed section/page numbers.
 
 ## 8080 CPU manuals (instruction semantics, flags, timing, interrupts) — **FETCH-ONLY**
 
@@ -791,6 +848,79 @@ same pin.
 | `ss286/revocation_list.txt` | `revocation_list.txt` | `219381caae2bd5f86d616fd9ee7309193c1dc254589ef032c0059dd42db3716f` | The revoked-test hashes. **Vendored for a second reason:** x86jit's `ss286::load_revocations` reads this from the corpus directory, but its `fetch.sh` never downloads it — so today the revocation list is silently always empty and revoked tests are being trusted |
 | `ss286/CHANGELOG.md` | `CHANGELOG.md` | `5efd9f33316ea637f551a2662257cac0d5939ffc242bfa6252d0f5debe42cfc2` | Which corpus revision changed what — needed to tell a real regression from a corpus correction |
 | `ss286/LICENSE` | `LICENSE` | `17169beea9b37538e699029d724687acf89182988b78f5ddce0f65a01db14653` | MIT text (travels with the copies) |
+
+## SingleStepTests 8088 and V20 (differential-oracle documentation) — **VENDORED docs only**
+
+Two independent repository pins, for consumers comparing instruction execution against
+hardware captures. **These suites can falsify behaviour, never license it.** Instruction
+semantics require a primary vendor source; agreement with a suite does not define the ISA,
+and its opcode classifications and undefined-flag masks are harness policy rather than
+architectural authority. References to emulator tooling in upstream documentation describe
+the capture workflow; they do not make that tooling a source for deriving behaviour.
+
+- **SingleStepTests 8088 V2, version 2.0.1**: `https://github.com/SingleStepTests/8088`
+  at commit `aea84484abc79d09639d855b7b0ab32bc9e4dbeb` (2025-09-03).
+  README: `https://raw.githubusercontent.com/SingleStepTests/8088/aea84484abc79d09639d855b7b0ab32bc9e4dbeb/README.md`.
+  Upstream says V2 captures an AMD D8088 (8441DMA), maximum mode, using Arduino8088;
+  the older V1 documentation is retained separately, not substituted for the V2 format.
+- **SingleStepTests V20 V1**: `https://github.com/SingleStepTests/v20`
+  at commit `6b3748f97533d606249382cad8d94b1c165ef93d` (2026-10-17).
+  README: `https://raw.githubusercontent.com/SingleStepTests/v20/6b3748f97533d606249382cad8d94b1c165ef93d/README.md`.
+  The README labels the version **1.0.4**, while the changelog records **1.0.5**
+  (2026-10-13), correcting bad initial RAM arrays in 6E/6F tests. Use the commit,
+  not the README's version string alone, to identify the corpus revision.
+  Upstream says it captures an NEC 8902NX D70108C-8, maximum mode, using ArduinoX86.
+  The pin covers native-mode documentation; the README describes 8080 emulation-mode
+  tests as future work. It does not establish coverage of the V30 or its 16-bit bus.
+
+Both pinned root `LICENSE` files explicitly grant **MIT** redistribution of software and
+associated documentation, subject to preserving their copyright and permission notices.
+The copies below are unmodified and retain those licence texts. No order number or page
+count applies to these Markdown/metadata sources. The metadata files describe opcode
+classification and comparison masks, not individual test inputs or expected results.
+Test vectors, archives and implementation tools are excluded from the fetch table and
+vendored allow-list. Consumers fetch corpus data separately at these same commits.
+
+The complete recursive trees at these commits contain **no revocation list and no separate
+known-issues file**. Known limitations, excluded instruction forms and corrections are in
+the READMEs and changelogs below; absence of a revocation file is not a claim that every
+test is valid. The 8088 binary README contains its MOO format description; V20's pinned
+README documents JSON and points to MOO. Do not assume these historical binary formats
+are interchangeable with the separately pinned 80286 MOO format.
+
+Both suites assume writable 1 MiB RAM, no wait states, and do not exercise interrupts or
+traps. Their README sections describe sparse final state, prefetch queues, bus-cycle
+records, input-port values, masked string/shift counts, undefined flags and omitted forms.
+V20's interrupt-delay notes are prose claims, explicitly outside the exercised tests.
+Use those constraints when interpreting failures; neither pin establishes coverage for
+every CPU model, interrupt path, undefined form, or bus timing configuration.
+
+**x86jit decision-23 P4 (xj-nil)** uses these pins for the 8086/8088 and V20/V30
+model-validation work associated with C2 and the V-series models. An 8088 capture is not
+an 8086 bus witness, and a V20 capture is not a V30 bus witness. Vendor manuals remain
+the sources for semantics, including decision-23 P1/P3 and the NEC manual above.
+
+| File (same relative path upstream) | Bytes | sha256 |
+|---|---|---|
+| `ss8088/CHANGELOG.md` | 1191 | `7a3bffca92373987fae5eae67e9999ee82b739f2f4c4eac10f51332f52755ff2` |
+| `ss8088/LICENSE` | 1072 | `9b9e332ee11019f131e945d40e20ab0c48b52921754dc03fe62cc85b579e6c61` |
+| `ss8088/README.md` | 19338 | `2f6c78e2b5af5d71dc19a3d686dbc8b3e8db37fbc5765c976966cff39f69a164` |
+| `ss8088/tools/README.md` | 1300 | `f450e5eaa617bcb522603c9b985e09da4ac55254b59f5daee1db64faa18a486b` |
+| `ss8088/v1/CHANGELOG.md` | 888 | `a490c3b3f247612e54d7ed8bd8d8afcd7c91555d450581e259136ff73d8d9353` |
+| `ss8088/v1/README.md` | 16103 | `d7759a8434bcb7f929de361342bc8ab8bba967ac233ab0f082c6d8e2fc48e35e` |
+| `ss8088/v1/metadata.json` | 30687 | `ccda90ad5c324c5e511ee3f0be062e51290c975c6c4917ae22ee0f275286794a` |
+| `ss8088/v2/metadata.json` | 30044 | `5ec19ecd5080d3ce583772ee6d157dcb66cf3bc0708c49a29f387ae5ced07a5d` |
+| `ss8088/v2_binary/README.md` | 8524 | `8e1729927b87957bcefc3f64a749cdc1b2e0521bd39eccc234f51a392bd1b65f` |
+| `ss8088/v2_undefined/README.md` | 1914 | `f9d8deb172200f31a7627898ae48dcaab3db2c6a2034f69ae8d11e524be8f4a3` |
+| `ss8088/v2_undefined/metadata.json` | 30044 | `5ec19ecd5080d3ce583772ee6d157dcb66cf3bc0708c49a29f387ae5ced07a5d` |
+| `ssv20/CHANGELOG.md` | 579 | `a1a9e0ad5f6d3d1f6bca3ccf3a52f3c0dc275b45b13d216dce095e808560035c` |
+| `ssv20/LICENSE` | 1071 | `cb3882ef501e91281c1948f71ed62bfca6562345a98f5fc1b69824f62b6e1557` |
+| `ssv20/README.md` | 25056 | `e1892716b32c096071361523e3d14edf0ae98d74875ce5782d68cc439f08315a` |
+| `ssv20/test_tools/LICENSE` | 1071 | `cb3882ef501e91281c1948f71ed62bfca6562345a98f5fc1b69824f62b6e1557` |
+| `ssv20/test_tools/README.md` | 1056 | `3dbfc6b6b1eb61e4af480bca5229a614940cb631574f10418b540dc03c205105` |
+| `ssv20/v1_native/metadata.json` | 47268 | `8e31531c9590c48dc55915e2581583316bb5051fd484ad6f8aed3c245be1eddd` |
+| `ssv20/v1_native/metadata.toml` | 26524 | `077915e330c302f71bf561a17014f0aa65f6634d90f1e364ae4ce183ebf2d61a` |
+| `ssv20/v1_native_binary/metadata.json` | 47268 | `8e31531c9590c48dc55915e2581583316bb5051fd484ad6f8aed3c245be1eddd` |
 
 ## MOO — the corpus's binary container (`dbalsom/moo`) — **VENDORED**
 

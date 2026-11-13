@@ -47,12 +47,16 @@ separately, because they mean opposite things:
 Vendored: the Vulkan specification chapters and `vk.xml` (CC-BY-4.0 / Apache-2.0 OR MIT), Mesa
 `src/amd` + `radeonsi` (MIT), the AMD `radeon`/`amdgpu` kernel headers (MIT), FreeBSD 9.0
 sources (BSD), the Linux x86 syscall tables and process/signal uapi headers (GPL-2.0 WITH
-Linux-syscall-note), and the SingleStepTests 80286 documentation plus the MOO container format
-(MIT). Unmodified, with their licence texts and copyright headers.
+Linux-syscall-note), and the SingleStepTests 80286, 8088 and V20 documentation plus the MOO
+container format (MIT). The 8088/V20 pins also include opcode classification and flag-mask
+metadata, with no test vectors or tools. Unmodified, with their licence texts and copyright
+headers. These suites can falsify behaviour, never license it; see their limits in `MANIFEST.md`.
 
 **Not** vendored, and fetched to a gitignored working copy instead: the **AMD ISA PDFs**
 (© AMD, no redistribution licence — these must never be committed), the **Intel SDM** and the
-**AMD64 APM** (same reason), the **SPIR-V core specification** (the Khronos grant covers use
+**AMD64 APM** (same reason), **The 8086 Family User's Manual** and the **iAPX 86/88,
+186/188 Programmer's Reference** (© Intel, no redistribution grant; pinned by order number
+and SHA256), the **SPIR-V core specification** (the Khronos grant covers use
 and reproduction, not clearly redistribution), the **x86-64 psABI** (its repository carries no
 licence file at all), the **OpenOrbis toolchain** (GPL-3, so it legally could be — but it is
 169 MB for a handful of headers, and the provenance quarantine below rewrites one of its files,

@@ -37,6 +37,19 @@
 !moo/*
 !ss286/
 !ss286/*
+!ss8088/
+!ss8088/**/
+!ss8088/**/README.md
+!ss8088/**/CHANGELOG.md
+!ss8088/**/LICENSE
+!ss8088/**/metadata.json
+!ssv20/
+!ssv20/**/
+!ssv20/**/README.md
+!ssv20/**/CHANGELOG.md
+!ssv20/**/LICENSE
+!ssv20/**/metadata.json
+!ssv20/**/metadata.toml
 
 # --- NEVER committed (restated after the allow-list, so it wins) ---
 # AMD ISA PDFs: © AMD, no redistribution licence.

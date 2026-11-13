@@ -46,6 +46,8 @@ KERNEL_X86_REF="v6.12"                                # torvalds/linux tag (x86 
 PSABI_COMMIT="e1ce098331da5dbd66e1ffc74162380bcc213236"  # x86-64 psABI, 2025-03-12
 MOO_COMMIT="c438962d2b30856817d8e59bd5f0f4c628596ca8"    # dbalsom/moo, 2025-11-19
 SS286_COMMIT="37c73caf53dcd22d3dd369ff09305d13d117a4fe"  # SingleStepTests/80286, 2025-11-02
+SS8088_COMMIT="aea84484abc79d09639d855b7b0ab32bc9e4dbeb" # SingleStepTests/8088, 2025-09-03
+SSV20_COMMIT="6b3748f97533d606249382cad8d94b1c165ef93d"  # SingleStepTests/v20, 2026-10-17
 
 # Intel SDM: the "latest" endpoint (cdrdv2.intel.com/v1/dl/getContent/671200) MOVES on every
 # revision, so it cannot be the pin. The pin is the revision-specific asset it redirects to —
@@ -63,6 +65,10 @@ APM_PUB="40332"
 # mirror serves the byte-identical file (same sha256), so the mirror is the pin.
 I386PRM_ORDER="230985-001"
 I286PRM_ORDER="210498-005"   # 80286 and 80287 Programmer's Reference Manual (1987); same mirror rule
+# Early x86 manuals: order numbers checked on the scanned covers, dates on title pages.
+# These use the bitsavers trailing-edge mirror; the primary archive refuses curl (403).
+I8086UM_ORDER="9800722-03"  # The 8086 Family User's Manual (October 1979), 748 pp
+I186PRM_ORDER="210911-001" # iAPX 86/88, 186/188 User's Manual, Programmer's Reference (May 1983), 550 pp
 # Intel 8080 manuals for x80; same mirror rule. ORDER is the order number printed on the
 # document itself. The mirror files the assembly-language manual as revision "9800301D";
 # its title page prints 9800301-04 (May 1981 printing), so that URL cannot reuse ORDER.
@@ -78,10 +84,14 @@ RAW_KERNEL_X86="https://raw.githubusercontent.com/torvalds/linux/${KERNEL_X86_RE
 RAW_PSABI="https://gitlab.com/x86-psABIs/x86-64-ABI/-/raw/${PSABI_COMMIT}/x86-64-ABI"
 RAW_MOO="https://raw.githubusercontent.com/dbalsom/moo/${MOO_COMMIT}"
 RAW_SS286="https://raw.githubusercontent.com/SingleStepTests/80286/${SS286_COMMIT}"
+RAW_SS8088="https://raw.githubusercontent.com/SingleStepTests/8088/${SS8088_COMMIT}"
+RAW_SSV20="https://raw.githubusercontent.com/SingleStepTests/v20/${SSV20_COMMIT}"
 SDM_URL="https://cdrdv2-public.intel.com/${SDM_ASSET}"
 APM_URL="https://web.archive.org/web/2id_/https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/${APM_PUB}.pdf"
 I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM_ORDER}_80386_Programmers_Reference_Manual_1986.pdf"
 I286PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80286/${I286PRM_ORDER}_80286_and_80287_Programmers_Reference_Manual_1987.pdf"
+I8086UM_URL="https://bitsavers.trailing-edge.com/components/intel/8086/${I8086UM_ORDER}_The_8086_Family_Users_Manual_Oct79.pdf"
+I186PRM_URL="https://bitsavers.trailing-edge.com/components/intel/80186/${I186PRM_ORDER}_iAPX86_88_186_188_Programmers_Reference_1983.pdf"
 I8080UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/${I8080UM_ORDER}_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf"
 I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf"
 # 8085 sources for x80 (M3); same mirror rule as the 8080 manuals.
@@ -352,6 +362,31 @@ ss286/LICENSE                      ${RAW_SS286}/LICENSE                         
 ss286/README.md                    ${RAW_SS286}/README.md                                      10000
 ss286/CHANGELOG.md                 ${RAW_SS286}/CHANGELOG.md                                     200
 ss286/revocation_list.txt          ${RAW_SS286}/revocation_list.txt                              100
+
+# --- SingleStepTests 8088 and V20: MIT-licensed documentation and opcode metadata only.
+# READMEs include the JSON/MOO formats, known limitations and exclusions; changelogs record
+# corrections. Neither pinned tree has a revocation list or separate known-issues file.
+# Metadata describes opcode classifications and comparison masks, not per-test vectors.
+# These are falsifying oracles, never authority to license instruction behaviour.
+ss8088/CHANGELOG.md ${RAW_SS8088}/CHANGELOG.md 595
+ss8088/LICENSE ${RAW_SS8088}/LICENSE 536
+ss8088/README.md ${RAW_SS8088}/README.md 9669
+ss8088/tools/README.md ${RAW_SS8088}/tools/README.md 650
+ss8088/v1/CHANGELOG.md ${RAW_SS8088}/v1/CHANGELOG.md 444
+ss8088/v1/README.md ${RAW_SS8088}/v1/README.md 8051
+ss8088/v1/metadata.json ${RAW_SS8088}/v1/metadata.json 15343
+ss8088/v2/metadata.json ${RAW_SS8088}/v2/metadata.json 15022
+ss8088/v2_binary/README.md ${RAW_SS8088}/v2_binary/README.md 4262
+ss8088/v2_undefined/README.md ${RAW_SS8088}/v2_undefined/README.md 957
+ss8088/v2_undefined/metadata.json ${RAW_SS8088}/v2_undefined/metadata.json 15022
+ssv20/CHANGELOG.md ${RAW_SSV20}/CHANGELOG.md 289
+ssv20/LICENSE ${RAW_SSV20}/LICENSE 535
+ssv20/README.md ${RAW_SSV20}/README.md 12528
+ssv20/test_tools/LICENSE ${RAW_SSV20}/test_tools/LICENSE 535
+ssv20/test_tools/README.md ${RAW_SSV20}/test_tools/README.md 528
+ssv20/v1_native/metadata.json ${RAW_SSV20}/v1_native/metadata.json 23634
+ssv20/v1_native/metadata.toml ${RAW_SSV20}/v1_native/metadata.toml 13262
+ssv20/v1_native_binary/metadata.json ${RAW_SSV20}/v1_native_binary/metadata.json 23634
 EOF
 }
 
@@ -407,6 +442,13 @@ intel/i386-prm.pdf ${I386PRM_URL} 20000000
 # mode entry, 286 descriptor format) and the 80287 coprocessor that the current SDM does not
 # describe. © Intel, no redistribution licence: cite-only, like the SDM.
 intel/i286-prm.pdf ${I286PRM_URL} 20000000
+# Early x86 CPUs: primary 8086/8088 instruction, flag and bus source (decision-23 P1/C2).
+# ${I8086UM_ORDER}, October 1979, 748 pp, 62,967,963 bytes; OCR scan, check page images.
+intel/i8086-um.pdf ${I8086UM_URL} 30000000
+# Second witness for 8086/8088 and primary for 80186/80188 (decision-23 P3/C5).
+# ${I186PRM_ORDER}, May 1983, 550 pp, 33,392,201 bytes; OCR scan, check page images.
+# Both early Intel manuals are copyrighted with no redistribution grant: fetch-only.
+intel/i186-prm.pdf ${I186PRM_URL} 20000000
 # --- 8080 CPU manuals (x80) — © Intel, no redistribution licence. Cite-only, kept local.
 # Intel 8080 Microcomputer Systems User's Manual (${I8080UM_ORDER}, September 1975, 262 pp, a
 # scan with an OCR text layer) — x80's PRIMARY: the CPU chapter (interrupt, halt and start-up
@@ -1081,7 +1123,9 @@ HEAD
   printf '| Mesa — `src/amd` (common, registers, addrlib, llvm, compiler) and `src/gallium/drivers/radeonsi` (`mesa/mesa/`) | %s | `%s` | **MIT**, © Advanced Micro Devices, Inc., Red Hat, VMware, Valve and other Mesa contributors (SPDX header in each file). Licence text vendored as `mesa/mesa/licenses/MIT` and `mesa/mesa/docs/license.rst`. |\n' "$MESA_URL" "$MESA_COMMIT"
   printf '| Linux kernel — x86 syscall tables and process/signal uapi headers (`linux-x86/`) | https://github.com/torvalds/linux | `%s` | **GPL-2.0 WITH Linux-syscall-note** (SPDX header in each file). Licence text vendored as `linux-x86/COPYING` and `linux-x86/LICENSES_exceptions_Linux-syscall-note`. See the GPL-2.0 note below. |\n' "$KERNEL_X86_REF"
   printf '| MOO — the SingleStepTests container format: spec + reference parser (`moo/`) | https://github.com/dbalsom/moo | `%s` | **MIT**, © Daniel Balsom. Licence text vendored as `moo/LICENSE`. |\n' "$MOO_COMMIT"
-  printf '| SingleStepTests 80286 — documentation and revocation list only, **not** the corpus (`ss286/`) | https://github.com/SingleStepTests/80286 | `%s` | **MIT**, © Daniel Balsom. Licence text vendored as `ss286/LICENSE`. The 611 MB corpus itself is fetched by the consumer at this same pin, not mirrored here. |\n\n' "$SS286_COMMIT"
+  printf '| SingleStepTests 80286 — documentation and revocation list only, **not** the corpus (`ss286/`) | https://github.com/SingleStepTests/80286 | `%s` | **MIT**, © Daniel Balsom. Licence text vendored as `ss286/LICENSE`. The 611 MB corpus itself is fetched by the consumer at this same pin, not mirrored here. |\n' "$SS286_COMMIT"
+  printf '| SingleStepTests 8088 — documentation and opcode metadata only (`ss8088/`) | https://github.com/SingleStepTests/8088 | `%s` | **MIT**; upstream copyright and permission notice preserved in `ss8088/LICENSE`. Test vectors and tools are not mirrored. |\n' "$SS8088_COMMIT"
+  printf '| SingleStepTests V20 — documentation and opcode metadata only (`ssv20/`) | https://github.com/SingleStepTests/v20 | `%s` | **MIT**; upstream copyright and permission notice preserved in `ssv20/LICENSE` and `ssv20/test_tools/LICENSE`. Test vectors and tools are not mirrored. |\n\n' "$SSV20_COMMIT"
 
   cat <<'MIT'
 ### MIT licence text (Mesa, and the AMD kernel headers)
@@ -1151,6 +1195,8 @@ compare. They are not redistributed from here:
 | SPIR-V core specification — `vulkan/spirv-core.html` | Khronos specification copyright. It grants "a conditional copyright license to use and reproduce the unmodified Specification", immediately after a sentence that separately forbids the copy being "reproduced, republished, distributed, transmitted, displayed, broadcast or otherwise exploited" without written permission. The grant does not clearly extend to redistribution, so the safe reading is fetch-only. (Its pin is taken over the document with the CDN-injected challenge-script line removed — `registry.khronos.org` rewrites that line on every request, so the raw bytes are not reproducible and a raw sha256 pin could never be checked.) |
 | OpenOrbis PS4 Toolchain — `openorbis/` | GPL-3.0, so redistribution would be *legal*. It is fetch-only for two other reasons: the clone is ~169 MB for a handful of headers plus the OELF/SELF spec, and the provenance quarantine (`MANIFEST.md`) **rewrites** one of its headers — a vendored copy would be a modified redistribution, which is exactly the thing this stash exists to avoid. Pinned by commit. |
 | Intel SDM — `intel/sdm.pdf` (combined volumes 1, 2A-D, 3A-D, 4) | © Intel Corporation, published with **no redistribution licence**. Cite-only, same class as the AMD ISA manuals. Pinned by order number *and* sha256, because Intel's download endpoint always serves the newest revision. |
+| Intel, The 8086 Family User's Manual — `intel/i8086-um.pdf` | © Intel Corporation 1978, 1979. PDF page 3 prohibits copying or reproduction without prior written consent. **No redistribution licence**; cite-only, pinned by order number and sha256. |
+| Intel, iAPX 86/88, 186/188 User's Manual, Programmer's Reference — `intel/i186-prm.pdf` | © Intel Corporation 1983. **No redistribution grant found** in the manual; cite-only, pinned by order number and sha256. |
 | AMD64 APM — `intel/amd64-apm.pdf` (volumes 1-5) | © Advanced Micro Devices, Inc., **no redistribution licence**. Cite-only. This is the x86-64 CPU manual, distinct from the GPU ISA manuals in `amd/`. |
 | x86-64 psABI — `psabi/*.tex` | The upstream repository (gitlab.com/x86-psABIs/x86-64-ABI) carries **no `LICENSE` and no `COPYING` file at all**. The only licence statement in its tree is one line in `abi.tex`'s revision history scoping CC-BY-4.0 to *Intel's changes*, not to the document. That is weaker than the SPIR-V case above: there, a document-wide grant exists and is merely ambiguous about redistribution; here there is no document-wide grant to be ambiguous about. Fetch-only, pinned by commit, taken as LaTeX source — the PDF upstream advertises is a CI artifact of the latest master build and expires, so it cannot be pinned. |
 FETCHONLY
