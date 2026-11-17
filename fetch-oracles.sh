@@ -92,6 +92,8 @@ I386PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80386/${I386PRM
 I286PRM_URL="http://bitsavers.trailing-edge.com/components/intel/80286/${I286PRM_ORDER}_80286_and_80287_Programmers_Reference_Manual_1987.pdf"
 I8086UM_URL="https://bitsavers.trailing-edge.com/components/intel/8086/${I8086UM_ORDER}_The_8086_Family_Users_Manual_Oct79.pdf"
 I186PRM_URL="https://bitsavers.trailing-edge.com/components/intel/80186/${I186PRM_ORDER}_iAPX86_88_186_188_Programmers_Reference_1983.pdf"
+# Intel's "Undocumented iAPX 286 Test Instruction" (LOADALL), undated, 15 pp; PCjs archive scan.
+I286LOADALL_URL="https://docs.pcjs.org/manuals/intel/80286/80286_LOADALL.pdf"
 I8080UM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/${I8080UM_ORDER}_Intel_8080_Microcomputer_Systems_Users_Manual_197509.pdf"
 I8080ALPM_URL="http://bitsavers.trailing-edge.com/components/intel/MCS80/9800301D_8080_8085_Assembly_Language_Programming_Manual_May81.pdf"
 # 8085 sources for x80 (M3); same mirror rule as the 8080 manuals.
@@ -449,6 +451,11 @@ intel/i8086-um.pdf ${I8086UM_URL} 30000000
 # ${I186PRM_ORDER}, May 1983, 550 pp, 33,392,201 bytes; OCR scan, check page images.
 # Both early Intel manuals are copyrighted with no redistribution grant: fetch-only.
 intel/i186-prm.pdf ${I186PRM_URL} 20000000
+# Intel, "Undocumented iAPX 286 Test Instruction" (undated, 15 pp, a scan with an OCR text
+# layer): the only Intel description of the 80286 LOADALL instruction (0F 05), which the 80286
+# PRM omits. x86jit decision-23 amendment (LOADALL, 2026-11-17). Intel material with no
+# redistribution licence: cite-only.
+intel/i286-loadall.pdf ${I286LOADALL_URL} 4000000
 # --- 8080 CPU manuals (x80) — © Intel, no redistribution licence. Cite-only, kept local.
 # Intel 8080 Microcomputer Systems User's Manual (${I8080UM_ORDER}, September 1975, 262 pp, a
 # scan with an OCR text layer) — x80's PRIMARY: the CPU chapter (interrupt, halt and start-up

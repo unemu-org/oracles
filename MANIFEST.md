@@ -359,6 +359,32 @@ manuals below are what settles the disagreement.
   including covers and front matter. This is a scan with an OCR text layer (Paper Capture,
   2016): verify cited values against page images and cite the printed section/page numbers.
 
+## Intel 80286 LOADALL test instruction (undocumented 80286 instruction) — **FETCH-ONLY**
+
+| File | Title / publisher / edition | Bytes | Pages | sha256 | Licence |
+|---|---|---|---|---|---|
+| `intel/i286-loadall.pdf` | Intel, Undocumented iAPX 286 Test Instruction (LOADALL), undated | 5,616,189 | 15 | `5c5a128ea7d5500c62f75efb24d1bac7ac392bb4f2fa21dce9a0277ac9d8e13d` | Intel material, no copyright notice in the scan; cite-only, no redistribution grant found |
+
+- Fetch URL: `https://docs.pcjs.org/manuals/intel/80286/80286_LOADALL.pdf` (the PCjs
+  documentation archive; `pdfinfo` gives the title "80286 LOADALL Instruction (Undated)",
+  author Intel). No other archive copy was checked for byte identity.
+- **Fetch-only:** Intel material with no redistribution licence. The PDF stays gitignored.
+- **Witnesses:** pp. 1-4, the LOADALL description: CPL 0 only (exception 13 with error
+  code 0 otherwise), the 102-byte table at physical address 800H and its field order, the
+  descriptor cache formats (24-bit base, access byte, 16-bit limit), and the cache rules in
+  real mode. p. 13, implementation notes, lists reserved-opcode aliases (82H as 80H, D0H/D1H
+  /6, F6H/F7H /1, D6H, F1H): a candidate second witness for the aliases the SDM lists.
+- **Internal conflicts, recorded here because a citation must say which page wins:**
+  - The opcode: p. 2 gives the encoding in bits, `00001111 00000101` (0F 05). p. 13 calls
+    LOADALL "opcode 0F04H" and says that 0F05H in real mode stops the 80286 until RESET,
+    and then, in its last sentence, that 0F05H "may be executed at any time in real address
+    mode". x86jit follows p. 2 (decision-23 amendment, LOADALL, 2026-11-17).
+  - The clock count: p. 2 gives both 195 and 190 clocks.
+  - p. 15 lists errata for early steppings.
+- **x86jit decision-23 amendment (LOADALL, 2026-11-17, xj-oog):** the source for LOADALL on
+  the I80286 Machine model, which the 80286 PRM does not describe.
+- This is a scan with an OCR text layer: verify cited values against the page images.
+
 ## 8080 CPU manuals (instruction semantics, flags, timing, interrupts) — **FETCH-ONLY**
 
 | File | Title | Pages | sha256 | License | Covers |
